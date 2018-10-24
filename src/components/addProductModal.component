@@ -1,0 +1,119 @@
+<apex:component allowDML="true" controller="addProductModalController">
+    <apex:attribute name="currentOpp" type="Opportunity" assignTo="{!oppty}" description="Opportunity Record"/>
+    <apex:attribute name="patientAccount" type="Account" assignTo="{!patient}" description="Patient Record"/>
+    <div class="slds">
+        <div class="slds-modal" aria-hidden="false" role="dialog" id="modalProd" >
+            <div class="slds-modal__container" style="max-width:80em; width:100%">
+                <div class="slds-modal__header">
+                    <h2 class="slds-text-heading--medium">Add Product</h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--large">
+                    <div class="slds-form">
+                        <div class="slds-grid" style="margin:1em;"> 
+                            <div class="slds-size--3-of-3">
+                                <div class="slds-form-element" style="margin-top:1em;">
+                                    <label class="slds-form-element__label" for="input-id-01"></label>
+                                    <div class="slds-form-element__control">
+                                    <apex:outputPanel id="prodPanel" html-alternateid="renderPanel" >
+                                        <table id="relatedcharts" class="display" cellspacing="0" width="100%">
+                                        </table> 
+                                    </apex:outputPanel>
+                                </div>
+                            </div>
+                        </div>
+                    </div>            
+                    <div class="slds-grid" style="margin:1em;">
+                    </div>
+                </div>
+              </div>
+              <div class="slds-modal__footer">
+                <button id="closeProdModal" class="slds-button slds-button--neutral" >Cancel</button>
+                <button id="saveProducts" class="slds-button slds-button--brand">Save</button>
+              </div>
+        </div>
+    </div>
+    <div class="slds-backdrop" id="backdropProd"></div>	
+
+    <!-- Button To Open Modal -->
+    <button class="slds-button slds-button--neutral compact-button" style="height:70px;" id="toggleBtnProd">Add Product</button>
+</div>
+
+<!-- Modal Toggle Script -->
+<script>
+    j$ = jQuery.noConflict();
+
+    var opptyId = '{!oppty.Id}';
+    var pbookId = '{!oppty.Pricebook2Id}';
+
+    function closeProdModal() {
+        j$('#modalProd').removeClass('slds-fade-in-open');
+        j$('#backdropProd').removeClass('slds-backdrop--open');
+    }
+    
+    j$('#closeProdModal').click(function(e) {
+        e.preventDefault();
+        window.location.reload();
+    })
+    //Modal Open
+    j$('#toggleBtnProd').click(function(e){
+        e.preventDefault();
+        addProductModalController.getProducts(createTable);
+        j$('#backdropProd').addClass('slds-backdrop--open');
+        j$('#modalProd').addClass('slds-fade-in-open');
+    });
+
+    j$('#saveProducts').click(function(e) {
+        e.preventDefault();
+        saveProducts();
+    });
+
+    var selectedProducts = {};
+    var prodDatatableExists = false;
+
+    function createTable(result, event) {
+        var table = j$('#relatedcharts').DataTable({
+            data: result,
+            columns: [
+                {data: "itemGroup", defaultContent: "&mdash;", title: "Item Group"},
+                {data: "itemId", defaultContent: "&mdash;", title: "Item ID"},
+                {data: "itemName", defaultContent: "&mdash;", title: "Item Name"},
+                {data: "manufacturer", defaultContent: "&mdash;", title: "Manufacturer"},
+                {data: "procedureCode", defaultContent: "&mdash;", title: "Procedure Code"}
+            ],
+            select: {
+                style: 'multi'
+            }
+        })
+        table.on('select', function(e, dt, type, indexes) {
+            var rowData = table.rows( indexes ).data();
+            addProduct(rowData[0]);
+        })
+        table.on('deselect', function(e, dt, type, indexes) {
+            var rowData = table.rows( indexes ).data();
+            removeProduct(rowData[0]);
+        })
+        prodDatatableExists = true;
+        j$('#relatedcharts').show();
+    }
+
+    function addProduct(prod) {
+        selectedProducts[prod.id] = {
+            itemGroup: prod.itemGroup,
+            itemId: prod.itemId,
+            itemName: prod.manufacturer,
+            procedureCode: prod.procedureCode,
+            id: prod.id,
+        }
+    }
+
+    function removeProduct(prod) {
+        if (selectedProducts[prod.id]) delete selectedProducts[prod.id];
+    }
+
+    function saveProducts() {
+        addProductModalController.doSave(selectedProducts, opptyId, pbookId, function(result, event) {
+            window.location.reload();
+        });
+    }
+</script>
+</apex:component>

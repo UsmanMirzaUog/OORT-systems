@@ -1,0 +1,157 @@
+<!--
+ - Created by danielpulache on 10/26/17.
+ -->
+
+<apex:component id="CreateSalesOrder" controller="CreateSalesOrderController">
+    <apex:attribute name="patientAccount" type="Account" assignTo="{!patient}" description="Patient Record"/>
+    <apex:attribute name="currentOpp" type="Opportunity" assignTo="{!oppty}" description="Opportunity Record"/>
+    <div class="slds">
+        <div class="slds-modal" aria-hidden="false" role="dialog" id="modalSalesOrder" >
+            <div class="slds-modal__container" style="max-width:80em; width:100%">
+                <div class="slds-modal__header">
+                    <h2 class="slds-text-heading--medium">Create Sales Order</h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--large">
+                    <div class="slds-form">
+                        <div class="slds-grid" style="margin:1em;">
+                            <div class="slds-size--3-of-3">
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="primaryBillingAddressModal">Select Billing Address:</label>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-select_container">
+                                            <select class="slds-select" id="primaryBillingAddressModal">
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-grid" style="margin:1em;"></div>
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="primaryDeliveryAddressModal">Select Delivery Address:</label>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-select_container">
+                                            <select class="slds-select" id="primaryDeliveryAddressModal">
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-grid" style="margin:1em;"></div>
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="orderingDoctorModal">Select Ordering Doctor:</label>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-select_container">
+                                            <select class="slds-select" id="orderingDoctorModal">
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-grid" style="margin:1em;"></div>
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="primaryProviderModal">Select Primary Doctor:</label>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-select_container">
+                                            <select class="slds-select" id="primaryProviderModal">
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-grid" style="margin:1em;"></div>
+                                <!--<div class="slds-form-element">-->
+                                    <!--<label class="slds-form-element__label" for="primaryInsuranceModal">Select Insurance:</label>-->
+                                    <!--<div class="slds-form-element__control">-->
+                                        <!--<div class="slds-select_container">-->
+                                            <!--<select class="slds-select" id="primaryInsuranceModal">-->
+                                            <!--</select>-->
+                                        <!--</div>-->
+                                    <!--</div>-->
+                                <!--</div>-->
+                            </div>
+                        </div>
+                        <div class="slds-grid" style="margin:1em;"></div>
+                    </div>
+                </div>
+                <div class="slds-modal__footer">
+                    <button id="closeSalesOrderModal" class="slds-button slds-button--neutral" >Cancel</button>
+                    <button id="createSalesOrder" class="slds-button slds-button--brand">Create in Brightree</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop" id="backdropSalesOrder"></div>
+
+        <!-- Button To Open Modal -->
+        <button class="slds-button slds-button--neutral compact-button" style="height:70px;" id="toggleBtnSalesOrder">Sync with BT</button>
+    </div>
+    <script>
+    j$ = jQuery.noConflict();
+    var patientId = '{!patient.Id}';
+    var oppId = '{!oppty.Id}';
+
+    function closeSalesOrderModal() {
+        j$('#modalSalesOrder').removeClass('slds-fade-in-open');
+        j$('#backdropSalesOrder').removeClass('slds-backdrop--open');
+    }
+
+    j$('#closeSalesOrderModal').click(function(e) {
+        e.preventDefault();
+        closeSalesOrderModal();
+    })
+    //Modal Open
+    j$('#toggleBtnSalesOrder').click(function(e){
+        e.preventDefault();
+        if (!initedSalesOrder) initSalesOrder();
+        j$('#backdropSalesOrder').addClass('slds-backdrop--open');
+        j$('#modalSalesOrder').addClass('slds-fade-in-open');
+    });
+
+    var initedSalesOrder = false;
+    function initSalesOrder() {
+//        var $payorSelect = j$('#primaryInsuranceModal');
+        var $addressSelect = j$('#primaryBillingAddressModal');
+        var $deliveryAddressSelect = j$('#primaryDeliveryAddressModal');
+        var $providerSelect = j$('#primaryProviderModal');
+        var $orderingDoctorSelect = j$('#orderingDoctorModal');
+        CreateSalesOrderController.getSalesOrderData(patientId, function(result, event) {
+            if (result) {
+                initedSalesOrder = true;
+//                result.payors.map(function(payor) {
+//                    $payorSelect.append(
+//                        j$('<option></option>').attr('value', payor.id).attr('label', payor.name + ' (' + payor.groupName + ')')
+//                    )
+//                });
+                result.billingAddresses.map(function(address) {
+                    $addressSelect.append(
+                        j$('<option></option>').attr('value', address.id).attr('label', address.name + ' - ' + address.street + ', ' + address.city + ', ' + address.state + ', ' + address.zip)
+                    )
+                });
+                result.deliveryAddresses.map(function(deliveryAddress) {
+                    $deliveryAddressSelect.append(
+                        j$('<option></option>').attr('value', deliveryAddress.id).attr('label', deliveryAddress.name + ' - ' + deliveryAddress.street + ', ' + deliveryAddress.city + ', ' + deliveryAddress.state + ', ' + deliveryAddress.zip)
+                    )
+                });
+                result.providers.map(function(provider) {
+                    $providerSelect.append(
+                        j$('<option></option>').attr('value', provider.id).attr('label', 'Dr. ' + provider.name + ' - ' +provider.phone )
+                    );
+                    $orderingDoctorSelect.append(
+                        j$('<option></option>').attr('value', provider.id).attr('label', 'Dr. ' + provider.name + ' - ' +provider.phone )
+                    );
+                });
+
+            }
+        });
+    }
+
+    j$('#createSalesOrder').click(function(e) {
+        if(false == true) {
+            //Handle Errors if any TODO: Handle missing data
+        } else {
+            //Undisplay error message
+            CreateSalesOrderController.goCreateSalesOrder(oppId, j$('#primaryBillingAddressModal').val(), j$('#primaryDeliveryAddressModal').val(), j$('#orderingDoctorModal').val(), j$('#primaryProviderModal').val(),
+                function(result, event) {
+//                    console.log(event);
+                    window.location.reload();
+                }
+            );
+        }
+    });
+    </script>
+</apex:component>

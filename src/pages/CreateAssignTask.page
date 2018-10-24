@@ -1,0 +1,364 @@
+<!--
+ - Created by danielpulache on 11/8/17.
+ -->
+
+<apex:page id="CreateAssignTask" controller="CreateAssignTaskController" docType="html-5.0">
+    <html xmlns="https://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <script src="{!URLFOR($Resource.aljs, '/jquery.aljs-all-with-moment.min.js')}"></script>
+    <apex:includeScript value="//code.jquery.com/jquery-2.1.1.min.js"/>
+    <apex:includeScript value="/soap/ajax/26.0/connection.js"/>
+    <apex:includeScript value="/js/functions.js"/>
+
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.css"/>
+    <!--<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>-->
+    <!--<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/select/1.2.3/js/dataTables.select.min.js"></script>-->
+    <!--<script type="text/javascript" charset="utf8" src="//cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>-->
+    <head>
+        <title>Create &amp; Assign Tasks</title>
+        <apex:slds />
+    </head>
+    <body>
+    <apex:form >
+        <div class="slds">
+            <!-- RELATED LIST CARDS-->
+            <div class="slds-grid slds-m-top--large">
+                <div class="slds-col slds-col-rule--right slds-p-right--large slds-p-left--large slds-size--8-of-12">
+                    <c:statusMessages />
+                    <div class="slds-card">
+                        <!--clay whitespace end-->
+                        <!-- / CARD BODY = SECTION + TABLE -->
+                        <header class="slds-card__header slds-grid" style="margin:1em;">
+                            <div class="slds-col slds-media slds-media--center">
+                                <div class="slds-media__figure">
+                                    <svg aria-hidden="true" class="slds-icon slds-icon-standard-contact slds-icon--small">
+                                        <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/standard-sprite/svg/symbols.svg#task')}"></use>
+                                    </svg>
+                                </div>
+                                <div class="slds-media__body">
+                                    <h3 class="slds-text-heading--small">Create &amp; Assign a Task</h3>
+                                </div>
+                            </div>
+                        </header>
+                        <section class="slds-card__body" style="margin:1em;">
+
+
+
+
+
+
+
+                            <div class="slds-grid" style="margin:1em;">
+                                <!-- Column 1 -->
+                                <div class="slds-size--1-of-3">
+                                    <div class="slds-form-element">
+                                        <label class="slds-form-element__label" for="taskTypePicklist">Task Type</label>
+                                        <div class="slds-form-element__control" style="overflow: auto;width: 350px">
+                                            <div class="slds-select_container">
+                                                <select class="slds-select" id="taskTypePicklist">
+                                                    <option>ADM</option>
+                                                    <option>Sales</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!--<apex:actionRegion>-->
+                                    <div id="patientSearchDiv" class="slds-form-element" style="margin-top:1em;">
+                                        <label class="slds-form-element__label slds-required" for="input-id-01"><!--<abbr class="slds-required" title="required">*</abbr>-->*Patient Search (required)</label>
+                                        <div class="slds-form-element__control" style="width: 350px" onChange="javascript:callGetProviders();" > <!-- reRender="$Component.CreateAssignTask,providerPanelForReRender" -->
+                                            <c:Typeahead searchBoxId="acctSearchBox" object="Account" primaryField="FirstName" secondaryField="LastName" destinationForSelectedId="accountId" destinationForSelectedValue="accountName" styleClass="slds-input"/>
+                                            <input type="hidden" name="accountId" id="accountId" styleClass="slds-input"  /> <!--onChange="getAllTheProviders(this.value);" -->
+                                            <input type="hidden" name="accountName" id="accountName" styleClass="slds-input" />
+                                            <!--<apex:actionSupport event="onChange" reRender="providerPanelForReRender,providerSearchDiv,providerPicklist" immediate="true" />-->
+                                        </div>
+                                        <div id="patient-error-message" class="slds-form-element__help" style="display:none;">Please specify a Patient name</div>
+                                    </div>
+                                    <!--</apex:actionRegion>-->
+                                    <!--<div id="providerSearchDiv" class="slds-form-element" style="margin-top:1em;">-->
+                                        <!--<label class="slds-form-element__label" for="input-id-02"><abbr class="slds-required" title="required">*</abbr>Provider Search (required)</label>-->
+                                        <!--<div class="slds-form-element__control" style="width: 350px">-->
+                                            <!--<c:Typeahead searchBoxId="providerSearchBox" object="Provider__c" destinationForSelectedId="providerId" styleClass="slds-input" destinationForSelectedValue="providerName"/>-->
+                                            <!--<input type="hidden" name="providerId" id="providerId" styleClass="slds-input"/>-->
+                                            <!--<input type="hidden" name="providerName" id="providerName" styleClass="slds-input"/>-->
+                                        <!--</div>-->
+                                        <!--<div id="provider-error-message" class="slds-form-element__help" style="display:none;">Please specify a Provider name</div>-->
+                                    <!--</div>-->
+
+                                    <apex:outputPanel id="providerPanelForReRender" >
+                                    <div id="providerSearchDiv" class="slds-form-element" style="margin-top:1em;">
+                                        <label class="slds-form-element__label slds-required" for="input-id-02"><!--<abbr class="slds-required" title="required">*</abbr>-->*Provider Search (required)</label>
+                                        <div class="slds-form-element__control" style="width: 350px">
+                                            <div class="slds-select_container">
+
+                                                <apex:selectList styleClass="slds-select" id="providerPicklist" required="false" value="{!theProvider}" size="1" disabled="{!providerDisabled}">
+                                                    <apex:selectOptions value="{!theProviders}"/>
+                                                </apex:selectList>
+
+                                            </div>
+                                            <input type="hidden" name="providerId" id="providerId" styleClass="slds-input"/>
+                                            <input type="hidden" name="providerName" id="providerName" styleClass="slds-input"/>
+                                        </div>
+                                        <div id="provider-error-message" class="slds-form-element__help" style="display:none;">Please specify a Provider name</div>
+                                    </div>
+                                    </apex:outputPanel>
+
+
+
+                                    <apex:actionFunction name="refreshProvider" action="{!getProviders}" reRender="providerPanelForReRender" >
+                                        <apex:param name="patientId" value="" assignTo="{!patientId}" />
+                                    </apex:actionFunction>
+
+
+                                </div>
+                                <!-- Column 2 -->
+                                <div class="slds-size--1-of-3">
+                                    <div class="slds-form-element" id="ownerDiv" style="display:none;">
+                                        <label class="slds-form-element__label" for="userId">Owner</label>
+                                        <div class="slds-form-element__control" style="width: 350px">
+                                            <c:Typeahead searchBoxId="ownerSearchBox" object="User" destinationForSelectedId="userId" styleClass="slds-input" destinationForSelectedValue="userName"/>
+                                            <input type="hidden" name="userId" id="userId" styleClass="slds-input"/>
+                                            <input type="hidden" name="userName" id="userName" styleClass="slds-input"/>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element" id="docTypeDiv">
+                                        <label class="slds-form-element__label slds-required" for="docTypePicklist">*Doc Type (required)</label>
+                                        <div class="slds-form-element__control slds-scrollable_none" style="overflow: auto;width: 350px">
+                                            <div class="slds-select_container">
+                                                <select class="slds-select" id="docTypePicklist">
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div id="doc-type-error-message" class="slds-form-element__help" style="display:none;">Please select a Doc Type</div>
+                                    </div>
+                                    <div class="slds-form-element" style="margin-top:1em;">
+                                        <label class="slds-form-element__label" for="priorityPicklist">Priority</label>
+                                        <div class="slds-form-element__control" style="overflow: auto;width: 350px">
+                                            <div class="slds-select_container">
+                                                <select class="slds-select" id="priorityPicklist">
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element" style="margin-top:1em;">
+                                        <label class="slds-form-element__label" for="subjectTypePicklist">Subject</label>
+                                        <div class="slds-form-element__control" style="overflow: auto;width: 350px">
+                                            <div class="slds-select_container">
+                                                <select class="slds-select" id="subjectTypePicklist">
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element slds-scrollable_none" style="margin-top:1em;">
+                                        <label class="slds-form-element__label" for="dateNeededSelector">Date Needed</label>
+                                        <div class="slds-form-element__control slds-scrollable_none" style="overflow: auto;width: 350px">
+                                            <div class="slds-form-element__control slds-scrollable_none" >
+                                                <apex:inputField id="dateNeededSelector" value="{!theTask.ActivityDate}" styleClass="slds-input slds-datepicker slds-is-today slds-scrollable_none" style="height: 30px"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Column 3 -->
+                                <div class="slds-size--1-of-3">
+                                    <div class="slds-form-element slds-grid" id="urgentCheckboxDiv">
+                                        <div class="slds-col slds-size--2-of-12">
+                                            <label class="slds-form-element__label" for="urgentCheckbox">Urgent?</label>
+                                            <div class="slds-form-element__control" style="margin-right:0px;height:32px;">
+                                                <input id="urgentCheckbox" type="checkbox" />
+                                            </div>
+                                        </div>
+                                        <div id="urgentReasonDiv" class="slds-col slds-size--10-of-12" style="display:none;">
+                                            <label class="slds-form-element__label" for="urgentReasonPicklist"><abbr class="slds-required" title="required">*</abbr>Reason (required)</label>
+                                            <div class="slds-form-element__control" style="overflow:auto;width:280px;">
+                                                <div class="slds-select_container">
+                                                    <select class="slds-select" id="urgentReasonPicklist">
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div id="urgent-reason-error-message" class="slds-form-element__help" style="display:none;">Please select an Urgent Reason</div>
+                                        </div>
+                                    </div>
+                                    <div class="slds-form-element" style="margin-top:1em;">
+                                        <label class="slds-form-element__label" for="noteTextArea">Notes</label>
+                                        <div class="slds-form-element__control" style="overflow: auto;width: 350px">
+                                            <div class="slds-select_container">
+                                                <textarea class="slds-textarea" rows="5" id="noteTextArea"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <br/>
+                                    <div class="slds-form-element" style="margin-top:1em; padding-left:250px">
+                                        <button class="slds-button slds-button--neutral slds-align-middle" id="createTask">Create Task</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <footer class="slds-card__footer">
+                            <!--<div>-->
+                            <!--<button class="slds-button slds-button&#45;&#45;neutral compact-button">Save</button>-->
+                            <!--</div>-->
+                        </footer>
+                    </div>
+                </div>
+                <!-- / MAIN CARD -->
+                <br />
+            </div>
+            <!-- / RELATED LIST CARDS -->
+        </div>
+    </apex:form>
+    </body>
+    <script>
+        var initedPage = false;
+        j$ = jQuery.noConflict();
+        j$(document).ready(function() {
+            initPage();
+        });
+
+        function initPage() {
+            var $TaskPriorityPicklist = j$('#priorityPicklist');
+            var $TaskSubjectPicklist = j$('#subjectTypePicklist');
+            var $TaskUrgentReasonPicklist = j$('#urgentReasonPicklist');
+            var $TaskDocTypePicklist = j$('#docTypePicklist');
+            CreateAssignTaskController.retrieveTaskInfo(function(result, event) {
+                if (result) {
+                    initedPage = true;
+                    result.TaskPriorityList.map(function(type) {
+                        $TaskPriorityPicklist.append(
+                            j$('<option></option>').attr('value', type).attr('label', type)
+                        );
+                    });
+                    result.TaskSubjectList.map(function(subject) {
+                        $TaskSubjectPicklist.append(
+                            j$('<option></option>').attr('value', subject).attr('label', subject)
+                        );
+                    });
+                    result.TaskUrgentReasonList.map(function(reason) {
+                        $TaskUrgentReasonPicklist.append(
+                            j$('<option></option>').attr('value', reason).attr('label', reason)
+                        );
+                    });
+                    result.TaskDocTypeList.map(function(type) {
+                        $TaskDocTypePicklist.append(
+                            j$('<option></option>').attr('value', type).attr('label', type)
+                        );
+                    });
+                }
+            });
+        }
+
+        j$('#createTask').click(function(e) {
+            j$("#errorMsgDiv").hide();
+            j$("#successMsgDiv").hide();
+            j$("div[id$='error-message']").hide();
+            j$("div[id$='Div']").removeClass('slds-has-error');
+            var areErrors = false;
+            e.preventDefault();
+
+            // Check required fields are filled in
+            // If Task Type is ADM, Doc Type is required
+            if (j$('#taskTypePicklist').val() == 'ADM' && j$('#docTypePicklist').val() == '–') {
+                j$('#docTypeDiv').addClass('slds-has-error');
+                j$('#doc-type-error-message').show();
+                areErrors = true;
+            }
+
+            // If Urgent Checkbox selected, Urgent Reason is required
+            if (j$('#urgentCheckbox').is(':checked') && j$('#urgentReasonPicklist').val() == '–') {
+                j$('#urgentReasonDiv').addClass('slds-has-error');
+                j$('#urgent-reason-error-message').show();
+                areErrors = true;
+            }
+
+            // Patient is required
+            if(j$('#accountId').val() == '') {
+                j$('#patientSearchDiv').addClass('slds-has-error');
+                j$('#patient-error-message').show();
+                areErrors = true;
+            }
+
+            // Provider is required
+            if(j$("select[id$='providerPicklist']").val() == '') {
+                j$('#providerSearchDiv').addClass('slds-has-error');
+                j$('#provider-error-message').show();
+                areErrors = true;
+            }
+
+            if (!areErrors) {
+                j$('#patientSearchDiv').removeClass('slds-has-error');
+                j$('#error-message').hide();
+                // public static void createTask(String patientId, String providerId, String ownerId, String taskPriority,
+                // String taskSubject, String dueDate, Boolean isUrgent, String urgentReason, String docType, String noteBody, String taskType)
+                CreateAssignTaskController.createTask(j$('#accountId').val(), j$("select[id$='providerPicklist']").val(), j$('#userId').val(),
+                    j$('#priorityPicklist').val(), j$('#subjectTypePicklist').val(), j$("[id$='dateNeededSelector']").val(),
+                    j$('#urgentCheckbox').is(':checked'), j$('#urgentReasonPicklist').val(),
+                    j$('#docTypePicklist').val(), j$('#noteTextArea').val(), j$('#taskTypePicklist').val(),
+                    function(result, event) {
+                        console.log(event);
+                        if (result != 'Success'){
+                            j$('#errorMsg').text(result);
+                            j$('#errorMsgDiv').show();
+                        } else {
+                            j$('#successMsg').text('Task created');
+                            j$('#successMsgDiv').show();
+                        }
+                        return false;
+                    }
+                );
+
+                // Reset form
+                resetForm();
+            }
+        });
+
+        j$('#urgentCheckbox').change(function(e) {
+            if (j$('#urgentCheckbox').is(':checked')) { // Urgent checkbox Checked
+                j$('#urgentReasonDiv').show(); // Show urgent reason picklist
+            } else { // Urgent checkbox unchecked
+                j$('#urgentReasonDiv').hide(); // Hide urgent reason picklist
+                j$('#urgentReasonPicklist').find('option:first').prop('selected', true); // Clear urgent reason picklist
+            }
+        });
+
+        j$('#taskTypePicklist').change(function(e) {
+           if (j$('#taskTypePicklist').val() == 'ADM') {
+               j$('#docTypeDiv').show(); // Show Doc Type picklist
+               j$('#urgentCheckboxDiv').show(); // Show urgent checkbox
+               j$('#ownerDiv').hide(); // Hide owner field
+               j$('#ownerDiv').val(''); // Clear owner field
+           } else if (j$('#taskTypePicklist').val() == 'Sales') {
+               j$('#ownerDiv').show(); // Show owner field
+               j$('#docTypeDiv').hide(); // Hide Doc Type field
+               j$('#docTypePicklist').find('option:first').prop('selected', true); // Clear Doc type reason picklist
+               j$('#urgentCheckboxDiv').hide(); // Hide urgent checkbox
+               j$('#urgentCheckbox').prop('checked', false); // Clear urgent checkbox
+               j$('#urgentReasonDiv').hide(); // Hide urgent reason picklist
+               j$('#urgentReasonPicklist').find('option:first').prop('selected', true); // Clear urgent reason picklist
+           }
+        });
+
+        function resetForm() {
+            j$('#accountId').val('');
+            j$('#acctSearchBox').val('');
+            j$('#providerId').val('');
+            j$('#providerSearchBox').val('');
+            j$('#userId').val('');
+            j$('#ownerSearchBox').val('');
+            j$('#priorityPicklist').find('option:first').prop('selected', true); // Clear priority picklist
+            j$('#subjectTypePicklist').find('option:first').prop('selected', true); // Clear subject picklist
+            j$("[id$='dateNeededSelector']").val(new Date().toLocaleDateString('en-us'));
+            j$('#urgentCheckbox').prop('checked', false);
+            j$('#urgentReasonDiv').hide(); // Hide urgent reason picklist
+            j$('#urgentReasonPicklist').find('option:first').prop('selected', true); // Clear urgent reason picklist
+            j$('#docTypePicklist').find('option:first').prop('selected', true); // Clear urgent reason picklist
+            j$('#noteTextArea').val('');
+            j$('#taskTypePicklist').find('option:first').prop('selected', true); // Clear urgent reason picklist
+            j$('#urgentCheckboxDiv').show();
+        }
+
+        function callGetProviders() {
+            console.log('javascript function callGetProviders();');
+            var aId = document.getElementById('accountId').value;
+            console.log('aId: ' + aId);
+            refreshProvider(aId);
+        }
+    </script>
+    </html>
+</apex:page>

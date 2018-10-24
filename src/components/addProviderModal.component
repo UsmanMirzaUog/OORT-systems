@@ -1,0 +1,227 @@
+<apex:component allowDML="true" controller="addProviderModalController">
+    <apex:attribute name="patientAccount" type="Account" assignTo="{!patient}" description="Patient Record"/>
+    <!--<apex:attribute name="currentOpp" type="Opportunity" assignTo="{!oppty}" description="Opportunity Record"/>
+    <apex:attribute name="patientAccount" type="Account" assignTo="{!patient}" description="Patient Record"/>  attributes passed in from OpportunityDetail page-->
+    <!--<link rel="stylesheet" href="https://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" media="all" />-->
+
+    <!-- First get JQuery -->
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>-->
+    <!-- Then get JQuery UI -->
+    <!--<script src="https://code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script>-->
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.css"/>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/select/1.2.3/js/dataTables.select.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
+
+    <script type="text/javascript">
+
+    </script>
+    <div class="slds">
+        <apex:actionRegion >
+        <div class="slds-modal" aria-hidden="false" role="dialog" id="modalProv" >
+            <div class="slds-modal__container" style="height: 100vh; max-width:80em; width:100%">
+                <div class="slds-modal__header">
+                    <h2 class="slds-text-heading--medium">Add Provider</h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--large">
+
+                    <!-- Warning toast: Search timed out -->
+                    <div class="toast-message" style="height: 4rem;" id="timeOutMessage">
+                        <div class="slds-notify_container slds-is-relative">
+                            <div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
+                                <span class="slds-assistive-text">Time Out Warning</span>
+                                <span class="slds-icon_container slds-icon-utility-success slds-m-right_small slds-no-flex slds-align-top" title="Time Out">
+                                    <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/utility-sprite/svg/symbols.svg#error')}" />
+                                    </svg>
+                                </span>
+                                <div class="slds-notify__content">
+                                    <h2 class="slds-text-heading_small ">Search request timed out. Please try again.</h2>
+                                </div>
+                                <button class="slds-button slds-button_icon slds-notify__close slds-button_icon-inverse" type="button" id="closeTimeOutMessage" title="Close">
+                                    <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                                      <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/utility-sprite/svg/symbols.svg#close')}" />
+                                    </svg>
+                                    <span class="slds-assistive-text">Close</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Error toast: Add Provider Exception -->
+
+                    <!-- Search Form -->
+                    <div class="slds-form">
+                        <div class="slds-grid" style="margin:1em;">
+                            <div class="slds-size--3-of-3">
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="providerSearchBox">Provider Search</label>
+                                    <div>
+                                        <input type="text" id="providerSearchBox" class="slds-input slds-size--11-of-12" placeholder="Enter Provider Last Name" oninput="handleInput(this)" />
+                                        <button class="slds-button slds-button_brand" id="searchProvidersButton">Search</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-grid" style="margin:1em;">
+                            <table id="searchResults" width="100%" class="row-border stripe"></table>
+                            <!-- Datatable goes here -->
+                        </div>
+                    </div>
+                  </div>
+                  <div class="slds-modal__footer">
+                    <button class="slds-button slds-button--neutral" id="closeProvModal">Cancel</button><button class="slds-button slds-button--neutral slds-button--brand" disabled="true" id="addProviderButton">Add Provider</button>
+                  </div>
+            </div>
+        </div>
+        </apex:actionRegion>
+        <div class="slds-backdrop" id="backdropProv"></div>
+
+        <!-- Button To Open Modal -->
+        <button class="slds-button slds-button--neutral compact-button" style="height:70px;" id="toggleBtnProv">Add Provider</button>
+    </div>
+
+    <script>
+        j$ = jQuery.noConflict();
+
+        j$(document).ready(function(){
+            j$('#timeOutMessage').hide();
+            //Search for providers when the Search Providers button clicked
+            j$('#searchProvidersButton').click(function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                searchProviders();
+            });
+
+            //Typing return in the input text box activates the search button
+            j$('#providerSearchBox').on('keyup', function(e) {
+                console.log(e);
+                if(e.which == 13){
+                    searchProviders();
+                }
+            });
+        });
+
+        var table;
+        var searchString = '';
+        var datatableExists = false;
+
+        var handleInput = function(event) {
+            searchString = event.value;
+        }
+
+        /*-------------------------------------------------------*/
+        // Calls remote action to search for providers
+        /*-------------------------------------------------------*/
+        function searchProviders(){
+            j$('#timeOutMessage').hide();
+            j$('#searchProvidersButton').prop('disabled', true);
+            console.log(j$('#searchProviderButton').prop('disabled'));
+
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.addProviderModalController.getProvidersByLastName}',
+                'http://13.64.71.110/api/Patient/searchProviderByLastName?lastName=' + searchString,
+                parseResponse,
+                {escape: true}
+            );
+
+            return false;
+        }
+
+        /*-------------------------------------------------------*/
+        // Parses the search results from the remote action and
+        // generates the data table
+        /*-------------------------------------------------------*/
+        function parseResponse(result, event){
+            if (event.status) {
+                console.log(result);
+                j$('#searchResults').show();
+
+                if(datatableExists) {
+                    j$('#searchResults').DataTable().destroy();
+                }
+
+                table = j$('#searchResults').DataTable({
+                    data: result,
+                    columns: [
+                        {data: "NPINumber", defaultContent: "&mdash;", title: "NPI"},
+                        {data: "FirstName", defaultContent: "&mdash;", title: "First Name"},
+                        {data: "LastName", defaultContent: "&mdash;", title: "Last Name"},
+                        {data: "Address1", defaultContent: "&mdash;", title: "Address"},
+                        {data: "City", defaultContent: "&mdash;", title: "City"},
+                        {data: "State", defaultContent: "&mdash;", title: "State"},
+                        {data: "PostalCode", defaultContent: "&mdash;", title: "Zip"},
+                        {data: "PhoneNumber1", defaultContent: "&mdash;", title: "Phone"},
+                        {data: "FaxNumber", defaultContent: "&mdash;", title: "Fax"}
+                    ],
+                    select: {
+                       style: 'single',
+                       info: false
+                    }
+                })
+
+                datatableExists = true;
+            } else if (event.type === 'exception') {
+                console.log('EXCEPTION: ' + event.statuscode);
+                console.log(event);
+                if(event.statusCode == 400){
+                    j$('#timeOutMessage').show();
+                }
+
+            } else {
+                console.log('NOTHING HAPPENED');
+            }
+            j$('#searchProvidersButton').prop("disabled", false);
+            j$('#addProviderButton').prop("disabled", false);
+        }
+
+        /*----------------------------------------------------------*/
+        // Call addProvider function from the controller when the
+        // Add Provider button is clicked
+        /*----------------------------------------------------------*/
+        j$('#addProviderButton').click(function (){
+            var provider = table.rows({selected: true}).data();
+
+            j$('input').removeAttr('required');
+
+            console.log(provider[0]);
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.addProviderModalController.addProvider}',
+                provider[0],'{!patient.Id}',
+                function(result, event){
+                    console.log('Result/Event: ', result, event);
+                    j$('#closeProvModal').trigger('click');
+                },
+                {escape: true}
+            );
+        })
+
+        j$('#closeTimeOutMessage').click(function(e){
+            j$('#timeOutMessage').hide();
+        })
+
+        //Modal Open
+        j$('#toggleBtnProv').click(function(e){
+            e.preventDefault();
+            j$('#backdropProv').addClass('slds-backdrop--open');
+            j$('#modalProv').addClass('slds-fade-in-open');
+        });
+
+        //Modal Close
+        j$('#closeProvModal').click(function(e){
+            //Reset the Provider search modal window to initial state
+            searchString = ''; //Clear search string
+            e.preventDefault();
+            if(datatableExists){
+                j$('#searchResults').DataTable().clear(); //Clear data out of data table
+                j$('#searchResults').DataTable().destroy(); //Destroy the table
+                j$('#searchResults').hide(); //Hide the table headers
+                j$('#addProviderButton').prop("disabled", true); //Disable the Add Provider button
+                j$('#providerSearchBox').val(''); //Clear out the input text box
+            }
+            j$('#modalProv').removeClass('slds-fade-in-open');
+            j$('#backdropProv').removeClass('slds-backdrop--open');
+        });
+    </script>
+    <!-- Modal Toggle Script -->
+</apex:component>

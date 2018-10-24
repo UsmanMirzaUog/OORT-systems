@@ -1,0 +1,163 @@
+<apex:component allowDML="true" controller="addInsurancePayorController">
+    <apex:attribute name="patientAccount" type="Account" assignTo="{!patient}" description="Patient Record"/>
+    <div class="slds">
+        <div class="slds-modal" aria-hidden="false" role="dialog" id="modalPayor" >
+            <div class="slds-modal__container" style="max-width:80em; width:100%">
+                <div class="slds-modal__header">
+                    <h2 class="slds-text-heading--medium">Add Insurance Payor</h2>
+                </div>
+                <!--<apex:pageBlock id="errorPageBlock">-->
+                    <apex:pageMessages id="pageMessages" />
+                <!--</apex:pageBlock>-->
+                <div class="slds-modal__content slds-p-around--large">
+                    <div class="slds-form">
+                        <div class="slds-grid" style="margin:1em;"> 
+                            <div class="slds-size--3-of-3">
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label slds-required" for="select-01">*Select Insurance</label>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-select_container">
+                                            <select class="slds-select slds-required" id="payor">
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-form-element" style="margin-top:1em;">
+                                    <div class="slds-grid">
+                                        <div class="slds-size--1-of-3">
+                                            <fieldset id="policyFieldset" class="slds-form-element">
+                                                <legend class="slds-form-element__legend slds-form-element__label slds-required">
+                                                    <abbr class="slds-required" title="required"></abbr>*Policy Level
+                                                </legend>
+                                                <div id="policyGroup" class="slds-form-element__control">
+                                                </div>
+                                                <div id="policyError" style="display: none" class="slds-form-element__help">This field is required.</div>
+                                            </fieldset>
+                                        </div>
+                                        <div class="slds-size--1-of-3 slds-form-element" id="startDateDiv" >
+                                            <label class="slds-form-element__label slds-required" for="startDate">*Policy Start Date</label>
+                                            <input type="date" id="startDate" class="slds-required slds-input" style="margin-top:1em;" />
+                                            <div id="startDateError" style="display: none;" class="slds-form-element__help">This field is required and cannot start before an existing policy.</div>
+                                        </div>
+                                        <div class="slds-size--1-of-3 slds-form-element" style="margin-left:1em;">
+                                            <label class="slds-form-element__label" for="endDate">Policy End Date</label>
+                                            <input type="date" id="endDate" class="slds-input" style="margin-top:0.7em;"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>            
+                        <div class="slds-grid" style="margin:1em;">
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-modal__footer">
+                    <button id="closePayorModal" class="slds-button slds-button--neutral" >Cancel</button>
+                    <button id="savePayor" class="slds-button slds-button--brand">Save</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop" id="backdropPayor"></div>	
+
+    <!-- Button To Open Modal -->
+    <button class="slds-button slds-button--neutral compact-button" style="height:70px;" id="toggleBtnPayor">Add Insurance</button>
+</div>
+
+<!-- Modal Toggle Script -->
+<script>
+    j$ = jQuery.noConflict();
+
+    var patientId = '{!patient.Id}';
+
+    function closePayorModal() {
+        j$('#modalPayor').removeClass('slds-fade-in-open');
+        j$('#backdropPayor').removeClass('slds-backdrop--open');
+    }
+    
+    j$('#closePayorModal').click(function(e) {
+        e.preventDefault();
+        closePayorModal();
+        //window.location.reload();
+    })
+    //Modal Open
+    j$('#toggleBtnPayor').click(function(e){
+        e.preventDefault();
+        if (!inited) init();
+        j$('#backdropPayor').addClass('slds-backdrop--open');
+        j$('#modalPayor').addClass('slds-fade-in-open');
+    });
+
+    //var radioValue = $("input[name='policy']:checked").val();
+    var inited = false;
+    function init() {
+        var $payorSelect = j$('#payor');
+        var $policyGroup = j$('#policyGroup');
+        addInsurancePayorController.getData(function(result, event) {
+            if (result) {
+                inited = true;
+                result.payors.map(function(payor) {
+                    $payorSelect.append(
+                        j$('<option></option>').attr('value', payor.id).attr('label', payor.name + ' (' + payor.groupName + ')')
+                    )
+                })
+                result.policyLevels.map(function(policyLevel) {
+                    $policyGroup.append(
+                        j$('<span></span>')
+                            .addClass('slds-radio')
+                            .append(
+                                j$('<input/>').attr('name', 'policy').attr('value', policyLevel.value).attr('type', 'radio').attr('id', policyLevel.value)
+                            ).append(
+                                j$('<label></label>').addClass('slds-radio__label').attr('for', policyLevel.value)
+                                .append(
+                                    j$('<span></span>').addClass('slds-radio_faux')
+                                ).append(
+                                    j$('<span></span>').addClass('slds-form-element__label').text(policyLevel.label)
+                                )
+                            )
+                    )
+                })
+            }
+        })
+    }
+
+    j$('#savePayor').click(function(e) {
+        e.preventDefault();
+
+        console.log(j$('#startDate').val());
+        console.log(j$('#endDate').val());
+
+
+        if (!j$("input[name='policy']:checked").val()) {
+            j$('#policyFieldset').addClass('slds-has-error')
+            j$('#policyError').show();
+        }
+        if (!j$('#startDate').val()) {
+            j$('#startDateDiv').addClass('slds-has-error')
+            j$('#startDateError').show();
+        }
+        else {
+            j$('#policyFieldset').removeClass('slds-has-error')
+            j$('#policyError').hide();
+            j$('#startDateDiv').removeClass('slds-has-error')
+            j$('#startDateError').hide();
+            addInsurancePayorController.savePayor(
+                j$('#payor').val(),
+                j$("input[name='policy']:checked").val(),
+                patientId,
+                j$('#startDate').val(),
+                j$('#endDate').val(),
+                function(result, event) {
+                    console.log(result);
+                    console.log(event);
+                    if (result == true){
+                        window.location.reload();
+                    } else {
+                        j$('#startDateDiv').addClass('slds-has-error')
+                        j$('#startDateError').show();
+                    }
+                }
+            )
+        }
+    });
+</script>
+</apex:component>

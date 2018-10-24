@@ -1,0 +1,646 @@
+<apex:component allowDML="true" controller="patientModalController">
+    <apex:attribute name="patientAccount" type="Account" assignTo="{!patient}" description="Patient Record"/>
+        <script src="{!URLFOR($Resource.aljs, '/jquery.aljs-all-with-moment.min.js')}"></script>
+        <apex:slds />
+    <!--  -->
+<div class="slds slds-scope">
+    <div class="slds-modal" aria-hidden="false" role="dialog" id="modal" >
+        <div class="slds-modal__container" style="max-width:80em; width:100%">
+            <div class="slds-modal__header">
+                <h2 class="slds-text-heading--medium">Patients &amp; Contacts</h2>
+              </div>
+              <div class="slds-modal__content slds-p-around--large">
+                <div class="slds-form">
+                    <apex:messages />
+            <h3 class="slds-section__title slds-theme--shade primaryPaletteBorder">
+                <span class="section-header-title slds-p-horizontal--small slds-truncate">Patient Details</span>
+            </h3>
+            <div class="slds-grid" style="margin:1em;">
+                <div class="slds-size--1-of-3">
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-01">Preferred Name</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField type="text" value="{!patient.Preferred_Name__pc}" id="input-id-01" styleClass="slds-input"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-02">First Name</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField type="text" value="{!patient.FirstName}" id="input-id-02" styleClass="slds-input"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-03">Last Name</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField type="text" value="{!patient.LastName}" id="input-id-03" styleClass="slds-input"/>
+                        </div>
+                    </div>
+                    <div class="slds-form--stacked">
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-04">Date of Birth</label>
+                        <div class="slds-form-element__control slds-input-has-icon slds-input-has-icon_right">
+                            <apex:inputField id="input-id-04" value="{!patient.PersonBirthdate}" styleClass="slds-input needs-date-picker"/>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+
+                <div class="slds-size--1-of-3" style="margin:1em;">
+                    <div class="slds-form-element" >
+                        <label class="slds-form-element__label" for="input-id-05">Active</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="input-id-05" value="{!patient.Active__pc}" styleClass="slds-input" style="height: 32px" />
+                        </div>
+                    </div>
+                    <div class="slds-size--1-of-1" style="margin:1em;">
+                        <div class="slds-grid slds-wrap">
+                            <div class="slds-size--1-of-2">
+                                <apex:actionRegion >
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="input-id-06">Responsible Party</label>
+                                    <div class="slds-form-element__control">
+                                        <apex:inputCheckbox id="input-id-06" value="{!patient.Responsible_Party__c}"  style="height:30px;" onfocus="this.blur()"> <!-- styleclass="slds-input" -->
+                                        	<apex:actionSupport event="onchange" rerender="responsiblePartySpan, primarySpan" />
+                                        </apex:inputCheckbox>
+                                    </div>
+                                </div>
+                                    </apex:actionRegion>
+                            </div>
+                            <div class="slds-size--1-of-2">
+                                <apex:actionRegion >
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="input-id-07">Primary Contact</label>
+                                    <div class="slds-form-element__control">
+                                        <apex:inputCheckbox id="input-id-07" value="{!patient.Primary_Contact__c}" style="height:30px;" onfocus="this.blur()"><!-- styleclass="slds-input" -->
+                                            <apex:actionSupport event="onchange" rerender="primarySpan" />
+                                        </apex:inputCheckbox>
+                                    </div>
+                                </div>
+                                </apex:actionRegion>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-08">Gender</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="input-id-08" value="{!patient.Gender__pc}" styleClass="slds-input" style="height: 32px" />
+                        </div>
+                    </div>
+                 </div>
+                <div class="slds-size--1-of-3" style="margin:1em;">
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label" for="input-id-10">Preferred Communication</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="input-id-10" value="{!patient.Preferred_Communication__pc}" styleClass="slds-input" style="height: 30px" />
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-11">Email</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="input-id-11" value="{!patient.PersonEmail}" styleClass="slds-input" style="height: 30px" />
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-12">Mobile Phone</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="input-id-12" value="{!patient.PersonMobilePhone}" styleClass="slds-input" style="height: 30px" />
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-13">Home Phone</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="input-id-13" value="{!patient.PersonHomePhone}" styleClass="slds-input" style="height: 30px" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-grid" style="margin-top:1em;">
+                <div class="slds-size--1-of-2" style="margin:1em;">
+                    <h4>Primary Billing Address</h4>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-14">Street</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="input-id-14" value="{!primaryBillingAddress.Street__c }" styleClass="slds-input" style="height: 30px" />
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-wrap">
+                        <div class="slds-form-element slds-size--2-of-4" style="margin-top:1em; padding-right:1em;">
+                            <label class="slds-form-element__label" for="input-id-15">City</label>
+                            <div class="slds-form-element__control">
+                                <apex:inputField id="input-id-15" value="{!primaryBillingAddress.City__c }" styleClass="slds-input" style="height: 30px" />
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-size--1-of-4" style="margin-top:1em; padding-right:1em;">
+                            <label class="slds-form-element__label" for="input-id-16">State</label>
+                            <div class="slds-form-element__control">
+                                <apex:inputField id="input-id-16" value="{!primaryBillingAddress.State_Province__c}" styleClass="slds-input" style="height: 30px" />
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-size--1-of-4" style="margin-top:1em;">
+                            <label class="slds-form-element__label" for="input-id-17">Zip</label>
+                            <div class="slds-form-element__control">
+                                <apex:inputField id="input-id-17" value="{!primaryBillingAddress.Zip_Postal_Code__c}" styleClass="slds-input" style="height: 30px" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-size--1-of-2" style="margin:1em;">
+                    <h4>Primary Delivery Address</h4>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-18">Street</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="input-id-18" value="{!primaryShippingAddress.Street__c}" styleClass="slds-input" style="height: 30px" />
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-wrap">
+                        <div class="slds-form-element slds-size--2-of-4" style="margin-top:1em; padding-right:1em;">
+                            <label class="slds-form-element__label" for="input-id-19">City</label>
+                            <div class="slds-form-element__control">
+                                <apex:inputField id="input-id-19" value="{!primaryShippingAddress.City__c}" styleClass="slds-input" style="height: 30px" />
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-size--1-of-4" style="margin-top:1em; padding-right:1em;">
+                            <label class="slds-form-element__label" for="input-id-20">State</label>
+                            <div class="slds-form-element__control">
+                                <apex:inputField id="input-id-20" value="{!primaryShippingAddress.State_Province__c }" styleClass="slds-input" style="height: 30px" />
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-size--1-of-4" style="margin-top:1em;">
+                            <label class="slds-form-element__label" for="input-id-21">Zip</label>
+                            <div class="slds-form-element__control">
+                                <apex:inputField id="input-id-21" value="{!primaryShippingAddress.Zip_Postal_Code__c}" styleClass="slds-input" style="height: 30px" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <apex:actionRegion >
+            <apex:outputPanel id="addAddress">
+                <div id="currentAddress">
+                    <apex:repeat value="{!addresses}" var="address">
+                        <div class='slds-grid' style='margin:1em;'>
+                            <div class='slds-size--1-of-2' style='margin-top:1em;'>
+                                <div class='slds-size--1-of-1' style='margin-top:1em;'>
+                                    <div style='margin-top:1em;'>
+                                        <label >Address Name</label>
+                                        <div >
+                                            <apex:inputField value="{!address.Name}" styleClass="slds-input" style="height: 30px" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class='slds-size--1-of-1' style='margin-top:1em;'>
+                                    <div style='margin-top:1em;'>
+                                        <label >Street</label>
+                                        <div >
+                                            <apex:inputField value="{!address.Street__c}" styleClass="slds-input" style="height: 30px" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class='slds-grid slds-wrap'>
+                                    <div class='slds-form-element slds-size--2-of-4' style='margin-top:1em; padding-right:1em;'>
+                                        <label >City</label>
+                                        <div >
+                                            <apex:inputField value="{!address.City__c}" styleClass="slds-input" style="height: 30px" />
+                                        </div>
+                                    </div>
+                                    <div class='slds-form-element slds-size--1-of-4' style='margin-top:1em; padding-right:1em;'>
+                                        <label >State</label>
+                                        <div >
+                                            <apex:inputField value="{!address.State_Province__c}" styleClass="slds-input" style="height: 30px" />
+                                        </div>
+                                    </div>
+                                    <div class='slds-form-element slds-size--1-of-4' style='margin-top:1em;'>
+                                        <label >Zip</label>
+                                        <div >
+                                            <apex:inputField value="{!address.Zip_Postal_Code__c}" styleClass="slds-input" style="height: 30px" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </apex:repeat>
+                </div>
+                <div >
+                    <div class='slds-grid' style='margin:1em;'>
+                        <div class='slds-size--1-of-2' style='margin-top:1em;'>
+                            <div class='slds-size--1-of-1' style='margin-top:1em;'>
+                                <div style='margin-top:1em;'>
+                                    <label >Address Name</label>
+                                    <div>
+                                        <apex:inputField value="{!insertAddress.Name}" styleClass="slds-input" style="height: 30px" />
+                                    </div>
+                            </div>
+                        </div>
+                        <div class='slds-size--1-of-1' style='margin-top:1em;'>
+                            <div style='margin-top:1em;'>
+                                <label >Street</label>
+                                <div>
+                                    <apex:inputField value="{!insertAddress.Street__c}" styleClass="slds-input" style="height: 30px" />
+                                </div>
+                            </div>
+                        </div>
+                        <div class='slds-grid slds-wrap'>
+                            <div class='slds-form-element slds-size--2-of-4' style='margin-top:1em; padding-right:1em;'>
+                                <label >City</label>
+                                <div>
+                                  <apex:inputField value="{!insertAddress.City__c}" styleClass="slds-input" style="height: 30px" />
+                                </div>
+                            </div>
+                            <div class='slds-form-element slds-size--1-of-4' style='margin-top:1em; padding-right:1em;'>
+                                <label >State</label>
+                                <div>
+                                    <apex:inputField value="{!insertAddress.State_Province__c}" styleClass="slds-input" style="height: 30px" />
+                                </div>
+                            </div>
+                            <div class='slds-form-element slds-size--1-of-4' style='margin-top:1em;'>
+                                <label >Zip</label>
+                                <div>
+                                  <apex:inputField value="{!insertAddress.Zip_Postal_Code__c}" styleClass="slds-input" style="height: 30px" />
+                                </div>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </apex:outputPanel>
+                <apex:commandLink type="button" action="{!addAddressRow}"  value="Save New Address" reRender="addAddress" styleclass="slds-button slds-button--neutral slds-button--brand"/><br/> <br/>
+            </apex:actionRegion>
+            <apex:outputPanel id="primarySpan">
+                    <apex:outputPanel rendered="{!NOT(patient.Primary_Contact__c)}">
+                    <!-- <script>j$('.needs-date-picker').datepicker();</script> -->
+                <h3 class="slds-section__title slds-theme--shade primaryPaletteBorder">
+                    <span class="section-header-title slds-p-horizontal--small slds-truncate">Primary Contact</span>
+                </h3>
+                <div class="slds-grid" style="margin:1em;">
+                <div class="slds-size--1-of-3">
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="primary-preferred-name">Preferred Name</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputHidden value="{!primaryContact.Id}" id="theHiddenInput"/>
+                            <apex:inputField id="primary-preferred-name"  value="{!primaryContact.Preferred_Name__c}" styleClass="slds-input" style="height: 30px"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="primary-first-name">First Name</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="primary-first-name" value="{!primaryContact.FirstName}" styleClass="slds-input" style="height: 30px"/>
+                        </div>
+                    </div>
+                    <div id="primaryLastNameDiv" class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="primary-last-name">Last Name</label>
+                        <div id="primary-last-name-error-message" class="slds-form-element__help" style="display:none;">Required field</div>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="primary-last-name" required="false" value="{!primaryContact.LastName}" styleClass="slds-input" style="height: 30px"/>
+                        </div>
+                    </div>
+                    <!-- <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="primary-input-id-42">Date of Birth</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputText id="primary-input-id-42" value="{!primaryContact.Birthdate}" styleClass="slds-input needs-date-picker" style="height: 30px"/>
+                        </div>
+                    </div> -->
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="primary-active">Active</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="primary-active" value="{!primaryContact.Active__c}" styleClass="slds-input" style="height: 32px"/>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slds-size--1-of-3" style="margin:1em;">
+
+                    <div class="slds-form-element" >
+                        <label class="slds-form-element__label" for="primary-responsible-party">Responsible Party</label>
+                        <div class="slds-form-element__control">
+                            <apex:actionRegion >
+                                <apex:inputCheckbox id="primary-responsible-party" value="{!primaryContact.Responsible_Party__c}" disabled="{!patient.Responsible_Party__c}" styleClass="slds-input" style="height: 30px" onfocus="this.blur()">
+                                    <apex:actionSupport event="onchange" rerender="responsiblePartySpan" />
+                                </apex:inputCheckbox>
+                            </apex:actionRegion>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="primary-gender">Gender</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="primary-gender" value="{!primaryContact.Gender__c}" styleClass="slds-input" style="height: 32px"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="primary-relationship">Relationship to Patient</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="primary-relationship" value="{!primaryContact.Relationship_to_Patient__c}" styleClass="slds-input" style="height: 30px"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="primary-preferred-communication">Preferred Communication</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="primary-preferred-communication" value="{!primaryContact.Preferred_Communication__c}" styleClass="slds-input" style="height: 30px"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-size--1-of-3" style="margin:1em;">
+
+                    <div class="slds-form-element" >
+                        <label class="slds-form-element__label" for="primary-email">Email</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="primary-email" value="{!primaryContact.Email}" styleClass="slds-input" style="height: 30px"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="primary-mobile-phone">Mobile Phone</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="primary-mobile-phone" value="{!primaryContact.MobilePhone}" styleClass="slds-input" style="height: 30px"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="primary-home-phone">Home Phone</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="primary-home-phone" value="{!primaryContact.Phone}" styleClass="slds-input" style="height: 30px"/>
+                        </div>
+                    </div>
+                </div>
+                </div>
+                <!-- <div class="slds-grid" style="margin:1em;">
+                    <div class="slds-size--1-of-2" style="margin:1em;">
+                        <h4>Address</h4>
+                        <div class="slds-form-element" style="margin-top:1em;">
+                            <label class="slds-form-element__label" for="input-id-52">Street</label>
+                            <div class="slds-form-element__control">
+                                <input type="text" id="input-id-52" class="slds-input"/>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-wrap">
+                        <div class="slds-form-element slds-size--2-of-4" style="margin-top:1em; padding-right:1em;">
+                            <label class="slds-form-element__label" for="input-id-53">City</label>
+                            <div class="slds-form-element__control">
+                                <input type="text" value="Chula Vista" id="input-id-53" class="slds-input"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-size--1-of-4" style="margin-top:1em; padding-right:1em;">
+                            <label class="slds-form-element__label" for="input-id-54">State</label>
+                            <div class="slds-form-element__control">
+                                <input type="text" value="CA" id="input-id-54" class="slds-input"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-size--1-of-4" style="margin-top:1em;">
+                            <label class="slds-form-element__label" for="input-id-55">Zip</label>
+                            <div class="slds-form-element__control">
+                                <input type="text" value="92145" id="input-id-55" class="slds-input"/>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                </div> -->
+                </apex:outputPanel>
+            </apex:outputPanel>
+            <apex:outputPanel id="responsiblePartySpan">
+                <apex:outputPanel rendered="{!NOT(patient.Responsible_Party__c) && NOT(primaryContact.Responsible_Party__c)}">
+                    <!-- <script>j$('.needs-date-picker').datepicker();</script> -->
+                <h3 class="slds-section__title slds-theme--shade primaryPaletteBorder">
+                    <span class="section-header-title slds-p-horizontal--small slds-truncate">Responsible Party</span>
+                </h3>
+                <div class="slds-grid" style="margin:1em;">
+                <div class="slds-size--1-of-3">
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="responsible-preferred-name">Preferred Name</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputHidden value="{!responsibleParty.Id}"/>
+                            <apex:inputField id="responsible-preferred-name" value="{!responsibleParty.Preferred_Name__c}" styleClass="slds-input" style="height: 30px" />
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="responsible-first-name">First Name</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="responsible-first-name" value="{!responsibleParty.FirstName}" styleClass="slds-input" style="height: 30px" />
+                        </div>
+                    </div>
+                    <div id="responsibleLastNameDiv" class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="responsible-last-name">Last Name</label>
+                        <div id="responsible-last-name-error-message" class="slds-form-element__help" style="display:none;">Required field</div>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="responsible-last-name" required="false" value="{!responsibleParty.LastName}" styleClass="slds-input" style="height: 30px" />
+                        </div>
+                    </div>
+                    <!-- <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="responsible-input-id-25">Date of Birth</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="responsible-input-id-25" value="{!responsibleParty.Birthdate}" styleClass="slds-input needs-date-picker" style="height: 30px" />
+                        </div>
+                    </div> -->
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="responsible-active">Active</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="responsible-active" value="{!responsibleParty.Active__c}" styleClass="slds-input" style="height: 32px" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="slds-size--1-of-3" style="margin:1em;">
+
+                    <!-- <div class="slds-form-element" >
+                        <label class="slds-form-element__label" for="responsible-input-id-28">Primary Contact</label>
+                        <div class="slds-form-element__control">
+                            <input type="checkbox" id="responsible-input-id-28" class="slds-input" style="height:30px;"/>
+                        </div>
+                    </div> -->
+                    <div class="slds-form-element" >
+                        <label class="slds-form-element__label" for="responsible-gender">Gender</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="responsible-gender" value="{!responsibleParty.Gender__c}" styleClass="slds-input" style="height: 32px" />
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="responsible-relationship">Relationship to Patient</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="responsible-relationship" value="{!responsibleParty.Relationship_to_Patient__c}" styleClass="slds-input" style="height: 30px" />
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="responsible-preferred-communication">Preferred Communication</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="responsible-preferred-communication" value="{!responsibleParty.Preferred_Communication__c}" styleClass="slds-input" style="height: 32px" />
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="responsible-email">Email</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="responsible-email" value="{!responsibleParty.Email}" styleClass="slds-input" style="height: 30px" />
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-size--1-of-3" style="margin:1em;">
+
+                    <div class="slds-form-element" >
+                        <label class="slds-form-element__label" for="responsible-mobile-phone">Mobile Phone</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="responsible-mobile-phone" value="{!responsibleParty.MobilePhone}" styleClass="slds-input" style="height: 30px" />
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="responsible-home-phone">Home Phone</label>
+                        <div class="slds-form-element__control">
+                            <apex:inputField id="responsible-home-phone" value="{!responsibleParty.Phone}" styleClass="slds-input" style="height: 30px" />
+                        </div>
+                    </div>
+                </div>
+                </div>
+                <!-- <div class="slds-grid" style="margin:1em;" id="responsiblePartyAddress">
+                    <div class="slds-size--1-of-2" style="margin:1em;">
+                        <h4>Address</h4>
+                        <div class="slds-form-element" style="margin-top:1em;">
+                            <label class="slds-form-element__label" for="responsible-input-id-35">Street</label>
+                            <div class="slds-form-element__control">
+                                <input type="text" id="responsible-input-id-35" class="slds-input"/>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-wrap">
+                            <div class="slds-form-element slds-size--2-of-4" style="margin-top:1em; padding-right:1em;">
+                                <label class="slds-form-element__label" for="responsible-input-id-36">City</label>
+                                <div class="slds-form-element__control">
+                                    <input type="text" value="Chula Vista" id="responsible-input-id-36" class="slds-input"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-size--1-of-4" style="margin-top:1em; padding-right:1em;">
+                                <label class="slds-form-element__label" for="responsible-input-id-37">State</label>
+                                <div class="slds-form-element__control">
+                                    <input type="text" value="CA" id="responsible-input-id-37" class="slds-input"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-size--1-of-4" style="margin-top:1em;">
+                                <label class="slds-form-element__label" for="responsible-input-id-38">Zip</label>
+                                <div class="slds-form-element__control">
+                                    <input type="text" value="92145" id="responsible-input-id-38" class="slds-input"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+                </apex:outputPanel>
+            </apex:outputPanel>
+                </div>
+            </div>
+            <div class="slds-modal__footer">
+            <button class="slds-button slds-button--neutral" id="closeModal">Cancel</button>
+            <!--<apex:commandButton id="savePatientContacts" action="{!doSave}" value="Save" styleclass="slds-button slds-button&#45;&#45;neutral slds-button&#45;&#45;brand"/>-->
+            <apex:commandButton id="savePatientContacts" onClick="saveForm();return false;" value="Save" styleclass="slds-button slds-button--neutral slds-button--brand"/>
+            </div>
+            <apex:actionFunction name="saveContacts" action="{!doSave}" />
+
+        </div>
+    </div>
+    <div class="slds-backdrop" id="backdrop"></div>
+
+    <!-- Button To Open Modal -->
+    <button class="slds-button slds-button--neutral compact-button" style="height:70px;" id="toggleBtn">Patient Details</button>
+</div>
+
+<!-- Modal Toggle Script -->
+<script>
+    j$ = jQuery.noConflict();
+    j$(document).ready(function() {
+        /*console.log('{!URLFOR($Resource.SLDS232)}');
+        j$.aljsInit({
+            assetsLocation: '{!URLFOR($Resource.SLDS232)}',
+            scoped: true,
+            scopingClass: 'slds-scope',
+        })
+        j$('.needs-date-picker').datepicker({
+            numYearsBefore: 100,
+            numYearsAfter: 0,
+            format: 'MM/DD/YYYY'
+        });*/
+    })
+
+    function saveForm() {
+        j$("#errorMsgDiv").hide();
+        j$("#successMsgDiv").hide();
+        j$("div[id$='Error']").hide();
+        j$("div[id$='Div']").removeClass('slds-has-error');
+        var primaryErrors = false;
+        var responsibleErrors = false;
+
+        // If any primary contact text input fields are populated, Last Name is required
+        var primaryInputFields = j$('input[id*="primary-"]'); //select all the primary contact fields
+        var primaryFields = 0;
+        primaryInputFields.each(function (index, elem) { //see if any input field is filled
+            if ( elem.value && !elem.name.endsWith('primary-responsible-party')) { //Don't check Responsible Party checkbox, it always has a value
+                primaryFields++;
+            }
+        });
+
+        if(primaryFields > 0 && !j$('input[id$="primary-last-name"]').val()) primaryErrors = true;
+
+        if (primaryErrors) {
+            j$('#primaryLastNameDiv').addClass('slds-has-error');
+            j$('#primary-last-name-error-message').show();
+            console.log('Primary contact errors');
+        } else {
+            j$('#primaryLastNameDiv').removeClass('slds-has-error');
+            j$('#primary-last-name-error-message').hide();
+            console.log('Primary Contact Good!');
+            // public static void createTask(String patientId, String providerId, String ownerId, String taskPriority,
+            // String taskSubject, String dueDate, Boolean isUrgent, String urgentReason, String docType, String noteBody, String taskType)
+//            CreateAssignTaskController.createTask(j$('#accountId').val(), j$('#providerId').val(), j$('#userId').val(),
+//                j$('#priorityPicklist').val(), j$('#subjectTypePicklist').val(), j$("[id$='dateNeededSelector']").val(),
+//                j$('#urgentCheckbox').is(':checked'), j$('#urgentReasonPicklist').val(),
+//                j$('#docTypePicklist').val(), j$('#noteTextArea').val(), j$('#taskTypePicklist').val(),
+//                function(result, event) {
+//                    console.log(event);
+//                    if (result != 'Success'){
+//                        j$('#errorMsg').text(result);
+//                        j$('#errorMsgDiv').show();
+//                    } else {
+//                        j$('#successMsg').text('Task created');
+//                        j$('#successMsgDiv').show();
+//                    }
+//                    return false;
+//                }
+//            );
+
+            // Reset form
+//            resetForm();
+        }
+
+
+        // If any responsible party text input fields are populated, Last Name is required
+        var responsibleInputFields = j$('input[id*="responsible-"]'); //select all the primary contact fields
+        var responsibleFields = 0;
+        responsibleInputFields.each(function (index, elem) { //see if any input field is filled
+            if ( elem.value && !elem.name.endsWith('primary-responsible-party')) {
+                responsibleFields++;
+            }
+        });
+        if(responsibleFields > 0 && !j$('input[id$="responsible-last-name"]').val()) responsibleErrors = true;
+
+        if (!responsibleErrors) {
+            j$('#responsibleLastNameDiv').removeClass('slds-has-error');
+            j$('#responsible-last-name-error-message').hide();
+            console.log('Responsible Party Good');
+        } else {
+            j$('#responsibleLastNameDiv').addClass('slds-has-error');
+            j$('#responsible-last-name-error-message').show();
+        }
+
+        if (!primaryErrors && !responsibleErrors) {
+            //Update the contacts
+            saveContacts();
+        }
+
+    }
+
+    //Modal Open
+    j$('#toggleBtn').click(function(e){
+       e.preventDefault();
+      j$('#backdrop').addClass('slds-backdrop--open');
+      j$('#modal').addClass('slds-fade-in-open');
+    });
+
+    //Modal Close
+    j$('#closeModal').click(function(e){
+       e.preventDefault();
+      j$('#modal').removeClass('slds-fade-in-open');
+      j$('#backdrop').removeClass('slds-backdrop--open');
+    });
+
+</script>
+</apex:component>

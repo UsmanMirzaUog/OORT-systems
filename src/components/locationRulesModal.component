@@ -1,0 +1,38 @@
+<!--
+ - Created by krizia on 6/2/18.
+ -->
+
+<apex:component id="locationRulesModal">
+
+    <script src="{!URLFOR($Resource.aljs, '/jquery.aljs-all-with-moment.min.js')}"></script>
+    <apex:slds />
+    <!--  -->
+    <div class="slds slds-scope">
+        <div class="slds-modal" aria-hidden="false" role="dialog" id="modal" >
+            <div class="slds-modal__container" style="max-width:80em; width:100%">
+                <div class="slds-modal__header">
+                    <h2 class="slds-text-heading--medium">Patients &amp; Contacts</h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--large">
+                    <div class="slds-form">
+                        <apex:messages />
+                        <h3 class="slds-section__title slds-theme--shade primaryPaletteBorder">
+                            <span class="section-header-title slds-p-horizontal--small slds-truncate">Location Rules</span>
+                        </h3>
+                        <div class="slds-grid" style="margin:1em;">
+                            <div class="slds-size--1-of-3">
+                                <div class="slds-form-element" style="margin-top:1em;">
+                                    <label class="slds-form-element__label" for="input-id-01">Preferred Name</label>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</apex:component>

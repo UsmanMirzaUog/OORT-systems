@@ -1,0 +1,101 @@
+<!--
+ - Created by krizia on 8/10/18.
+ -->
+
+<apex:component id="DexcomFieldsModal" allowDML="true" controller="DexcomFieldsModalController">
+    <apex:attribute name="patientAccount" type="Account" assignTo="{!patient}" description="Patient Record"/>
+    <apex:attribute name="currentOpp" type="Opportunity" assignTo="{!oppty}" description="Opportunity Record"/>
+    <div class="slds">
+        <div class="slds-modal" aria-hidden="false" role="dialog" id="modalDexcom" >
+            <div class="slds-modal__container" style="max-width:80em; width:100%">
+                <div class="slds-modal__header">
+                    <h2 class="slds-text-heading--medium">Dexcom Fields</h2>
+                </div>
+                <div class="slds-modal__content slds-p-around--large">
+                    <div class="slds-form">
+                        <apex:pageMessages />
+                        <div class="slds-grid" style="margin:1em;">
+                            <div class="slds-size--3-of-3">
+                                <div class="slds-form-element" style="margin-top:1em;">
+                                    <div class="slds-grid">
+                                        <div class="slds-size--1-of-2 slds-form-element"  >
+                                            <label class="slds-form-element__label" for="estimatedSensorCost">Estimated Sensor Cost</label>
+                                            <!--<apex:inputField value="{!oppty.Estimated_Sensor_Cost__c}" id="estimatedSensorCost" />-->
+                                            <input type="number" id="estimatedSensorCost"   /> <!-- value="{!oppty.Estimated_Sensor_Cost__c}" -->
+                                        </div>
+                                        <div class="slds-size--1-of-2 slds-form-element" style="margin-left:1em;">
+                                            <label class="slds-form-element__label" for="estimatedStartUpCost">Estimated Start Up Cost</label>
+                                            <!--<apex:inputField value="{!oppty.Estimated_Start_Up_Cost__c}" id="estimatedStartUpCost" />-->
+                                            <input type="number"  id="estimatedStartUpCost" /> <!--  value="{!oppty.Estimated_Start_Up_Cost__c}" -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-modal__footer">
+                    <button id="closeDexcomModal" class="slds-button slds-button--neutral" >Cancel</button>
+                    <button id="saveDexcomModal" class="slds-button slds-button--brand">Save</button>
+                </div>
+            </div>
+        </div>
+        <div class="slds-backdrop" id="backdropDexcom"></div>
+
+        <!-- Button To Open Modal -->
+        <button class="slds-button slds-button--neutral compact-button" style="height:70px;" id="toggleBtnDexcom">Dexcom Fields</button>
+    </div>
+
+    <!-- Modal Toggle Script -->
+    <script>
+    j$ = jQuery.noConflict();
+    j$('#estimatedSensorCost').val("{!oppty.Estimated_Sensor_Cost__c}");
+    j$('#estimatedStartUpCost').val("{!oppty.Estimated_Start_Up_Cost__c}");
+
+
+    //Modal Open
+    j$('#toggleBtnDexcom').click(function(e){
+        console.log('open Dexcom Fields modal');
+        e.preventDefault();
+   //     if (!inited) init();
+        j$('#backdropDexcom').addClass('slds-backdrop--open');
+        j$('#modalDexcom').addClass('slds-fade-in-open');
+        j$('#estimatedSensorCost').val("{!oppty.Estimated_Sensor_Cost__c}");
+        j$('#estimatedStartUpCost').val("{!oppty.Estimated_Start_Up_Cost__c}");
+        console.log('opened Dexcom Fields modal');
+    });
+
+    j$('#closeDexcomModal').click(function(e) {
+        e.preventDefault();
+        closeDexcomModal();
+        //window.location.reload();
+    });
+    function closeDexcomModal() {
+        j$('#modalDexcom').removeClass('slds-fade-in-open');
+        j$('#backdropDexcom').removeClass('slds-backdrop--open');
+    }
+
+    j$('#saveDexcomModal').click(function(e) {
+        e.preventDefault();
+
+        var sensor = j$('#estimatedSensorCost').val();
+        var startUp = j$('#estimatedStartUpCost').val();
+        console.log(sensor);
+        console.log(startUp);
+        console.log("{!oppty.Id}");
+
+        DexcomFieldsModalController.saveOpp(
+                "{!oppty.Id}",
+                sensor,
+                startUp,
+                function(result, event) {
+                    console.log(result);
+                    console.log(event);
+                    if (result == true){
+                        window.location.reload();
+                    }
+                }
+            );
+    });
+</script>
+</apex:component>

@@ -1,0 +1,128 @@
+<apex:page standardController="Opportunity" extensions="extConsole_TopPanel_Insurance" showHeader="false" standardStylesheets="false" sidebar="false" applyHtmlTag="false" applyBodyTag="false" docType="html-5.0">    
+
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<apex:includeScript value="//code.jquery.com/jquery-2.1.1.min.js"/>
+    <apex:includeScript value="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"/>
+    <apex:stylesheet value="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css"/>
+    <apex:includeScript value="/support/console/36.0/integration.js"/>
+    <script type="text/javascript"> 
+
+       /* var insuranceDatatable;
+        function renderRelatedInsurance()
+        {
+            insuranceDatatable = $('#relatedInsurance').DataTable(
+                {
+                    "columnDefs": [
+                        { "orderable": false, "targets": 1 }
+                    ],
+                    "sScrollY": "150", 
+                    "sScrollX": "80%", 
+                    "sScrollXInner": "100%", 
+                    "bScrollCollapse": true,
+                    "paginate": false,
+                    "order":[[4, "asc"], [2, "asc"]]
+
+                }
+            );
+        } */
+        $(document).ready( function () {
+            //renderRelatedInsurance();
+        });
+
+        function openCaseSubtab(url) {
+            // Check if user is in the Console, otherwise open as a regular URL
+            if (sforce.console.isInConsole()) {
+                sforce.console.getEnclosingPrimaryTabId(function(result){
+                    sforce.console.openSubtab(result.id, url, true, '', null);
+                    console.log('++++');
+                });
+            } else {
+                window.open(url);
+                console.log('@@@@');
+            }
+        }
+        
+      </script>   
+
+<head>
+  <title>Page Title</title>
+  <apex:slds />
+</head>    
+
+<body>    
+
+  <!-- REQUIRED SLDS WRAPPER -->
+  <div class="slds-scope">    
+
+    <!-- MASTHEAD -->
+    <h1 class="slds-text-heading--label slds-m-bottom--small">
+      Insurance: 
+    </h1>
+    <!-- / MASTHEAD -->    
+
+    <!-- PRIMARY CONTENT WRAPPER -->
+    <div class="slds-grid">    
+<table id="relatedInsurance" class="slds-table slds-table_bordered slds-table_cell-buffer">
+        <thead>
+          <tr class="slds-text-title_caps">
+            <th scope="col">
+              <div class="slds-truncate" title="Opportunity Name">Insurance Name</div>
+            </th>
+            <th scope="col">
+              <div class="slds-truncate" title="Account Name">Level</div>
+            </th>
+            <th scope="col">
+              <div class="slds-truncate" title="Close Date">ID</div>
+            </th>
+            <th scope="col">
+              <div class="slds-truncate" title="Stage">Group #</div>
+            </th>
+              <th scope="col">
+                  <div class="slds-truncate" title="Start Date">Start</div>
+              </th>
+              <th scope="col">
+                  <div class="slds-truncate" title="End Date">End</div>
+              </th>
+          </tr>
+        </thead>
+        <tbody>
+        <apex:repeat value="{!policyList}" var="pL">
+          <tr>
+            <td scope="row" data-label="Opportunity Name">
+              <div class="slds-truncate" title="Cloudhub"><a onClick="javascript:openCaseSubtab('/{!pL.Id}');">{!pL.Insurance__r.Name}</a></div>
+              <!--<apex:outputLink value="/{!pL.Id}" target="_parent" id="insuranceDetailLink">{!pL.Insurance__r.Name}</apex:outputLink> -->
+            </td>
+            <td data-label="Account Name">
+              <div class="slds-truncate" title="Cloudhub">{!pL.Policy_Level__c}</div>
+            </td>
+            <td data-label="Close Date">
+              <div class="slds-truncate" title="4/14/2015">{!pL.Policy_Id__c}</div>
+            </td>
+            <td data-label="Prospecting">
+              <div class="slds-truncate" title="Prospecting">{!pL.Group_Number__c}</div>
+            </td>
+              <td data-label="Start">
+                  <div class="slds-truncate" title="Start"><apex:outputText value="{0,date,MM-dd-yyyy}"><apex:param value="{!pL.Start_Date__c}" /></apex:outputText></div>
+              </td>
+              <td data-label="End">
+                  <div class="slds-truncate" title="End"><apex:outputText value="{0,date,MM-dd-yyyy}"><apex:param value="{!pL.End_Date__c}" /></apex:outputText></div>
+              </td>
+          </tr>
+          </apex:repeat>
+        </tbody>
+      </table>
+
+    </div>
+    <!-- / PRIMARY CONTENT WRAPPER -->    
+
+  </div>
+  <!-- / REQUIRED SLDS WRAPPER -->    
+
+</body>
+  <apex:form >
+     <!-- <apex:commandButton value="Add Policy" action="{!redirect}" style="right:align; width:80px" /> not ready for the button yet...removing for now-->
+      
+  </apex:form>
+
+</html>
+</apex:page>

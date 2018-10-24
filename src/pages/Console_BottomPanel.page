@@ -1,0 +1,171 @@
+<apex:page standardController="Opportunity" extensions="LogCallController" docType="html-5.0"> 
+
+  <html>
+
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" media="all" />
+
+<!-- First get JQuery -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <!-- Then get JQuery UI -->
+    <script src="https://code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script>
+
+    <html xmlns="https://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> 
+    <apex:includeScript value="/soap/ajax/26.0/connection.js"/>
+    <apex:includeScript value="/js/functions.js"/>
+    <apex:includeScript value="/support/console/36.0/integration.js"/>       
+
+<head>
+  <title>Page Title</title>
+  <apex:slds />
+</head>   
+<!-- Testing sync with sourceTree and git DB 8/31/17; one more time with feeling-->
+<body>    
+
+  <!-- REQUIRED SLDS WRAPPER -->
+  <div class="slds-scope">    
+
+    <!-- MASTHEAD -->
+
+    <!-- / MASTHEAD -->    
+
+    <!-- PRIMARY CONTENT WRAPPER 
+    <div class="slds-grid">    
+
+
+    </div> -->
+   <!-- / PRIMARY CONTENT WRAPPER -->    
+
+  </div>
+  <!-- / REQUIRED SLDS WRAPPER -->    
+
+</body>
+</html>
+
+    <apex:form id="theform">
+        <apex:pageBlock title="" id="thePageBlock" mode="maindetail" >
+            <apex:pageMessages id="errormsg"/>
+            <apex:pageBlockButtons location="top" style="align:right">
+                <apex:actionStatus id="SaveButtonStatus">
+                    <apex:facet name="stop">
+                        <apex:outputPanel style="float:right;">
+                            <table>
+                                <tr>
+                                    <td class="rem" style="width:700px;text-align: right">
+                                    </td>
+                                    <td style="width:51px"> 
+                                        <!--<apex:commandButton  value="Save" action="{!save}" status="SaveButtonStatus" rerender="errormsg" style="width:50px" oncomplete="reloadPage();"/> -->
+                                        <apex:commandButton value="Save" action="{!save}" status="SaveButtonStatus" rerender="errormsg" oncomplete="reloadPage(); return false;" style="width:50px;"/>
+                                    </td>
+                                    <td style="width:51px"> 
+                                        <apex:commandButton value="Cancel" action="{!foo}" onclick="blankAll(); return false;" style="width:50px;" />
+                                    </td>
+                                </tr>
+                            </table>
+                            <!--        onclick="return validate();" -->
+                        </apex:outputPanel>
+                    </apex:facet>
+                    <apex:facet name="start">
+                        <apex:outputPanel style="align:right;">
+                            <apex:commandButton value="Saving..." disabled="true" style="float:right;"/>
+                        </apex:outputPanel>
+                    </apex:facet>
+                </apex:actionStatus>
+                <!--         <apex:commandButton value="Save" action="{!save}" oncomplete="doParentReload();" /><br/> -->
+            </apex:pageBlockButtons>
+    <style type="text/css">
+        table {
+          width:100%;
+        }
+        th {
+          width:80%;
+        }
+        td {
+          width:150px;
+        }
+        select {
+            width: 200px;
+        }
+
+        .ui-datepicker
+        {
+            position: absolute;
+            font-size:12px;
+            width: 200px;
+            height: 165px;
+            top: 32px;
+        }
+    </style>
+    <table>
+        <tr>
+            <th rowspan="4"><apex:inputTextArea value="{!notes}" id="notes" style="width:95%; height:100px;"/></th>
+            <td> Log Type:<br/> <apex:inputField value="{!Opportunity.Log_Type__c}" id="logtype" style="width:140px;"/></td>
+            <td> Follow Up Date:<br/> <apex:inputText value="{!followUpDate}" id="datepicker" style="width:140px;"/></td>
+        </tr>
+        <tr>
+            <td>Call Outcome: <br/>
+            <apex:inputField value="{!Opportunity.Call_Outcome__c}" id="send" style="width:140px;"/></td>
+            <td>Call Disposition: <br/>
+            <apex:inputField value="{!Opportunity.Call_Disposition__c}" id="disposition" style="width:140px;"/></td>
+        </tr>
+        <tr>
+            <td align="left">Send to MFG?: <br/>
+                <apex:inputField value="{!Opportunity.Send_to_Manufacturer__c}" id="sendtomfg" onchange="hideManufacturer();" style="width:140px;text-align:left"/></td>
+            <td id="urgentCheckbox">Urgent?: <br/>
+                <apex:inputCheckbox id="urgCB" value="{!Opportunity.Urgent__c}" />
+            </td>
+        </tr>
+        <tr>
+            <td class="manufacturer">Manufacturer?: <br/>
+            <apex:inputField value="{!Opportunity.Manufacturer__c}" id="manufacturer" style="width:140px;"/></td>
+        </tr>
+    </table>
+
+    </apex:pageBlock>
+    </apex:form>
+
+    <script>
+
+    $( document ).ready(function() {
+      $( '.manufacturer' ).hide();
+    });
+
+    jQuery(function() {
+        jQuery("[id='{!$Component.theform.thePageBlock.datepicker}']").datepicker({
+              constrainInput: true,
+              showOptions: { direction: "left" },
+              lang:'en',
+              timepicker:false,
+              format:'DD/MM/YYYY',
+              formatDate:'Y/m/d',
+              minDate:'-1970/01/02', // yesterday is minimum date
+              maxDate:'+1970/01/02' // and tomorrow is maximum date calendar);
+            });
+    });
+
+    function blankAll() {
+        document.getElementById('{!$Component.theform.thePageBlock.notes}').value = '';
+        document.getElementById('{!$Component.theform.thePageBlock.datepicker}').value = '';
+        document.getElementById('{!$Component.theform.thePageBlock.callOutcome}').value = '';
+        document.getElementById('{!$Component.theform.thePageBlock.disposition}').value = '';
+    }
+
+    function reloadPage(){
+        //window.location.reload(true);
+        if($('[id$="errormsg"]').html() == '')
+            window.top.location='/console';
+    }
+
+    function hideManufacturer () {
+            var atype = document.getElementById('{!$Component.theform.thePageBlock.sendtomfg}').checked;
+            console.log (atype);
+
+            if (atype==true) {
+                $( '.manufacturer' ).show();
+            }
+            else if (atype==false) {
+                $( '.manufacturer' ).hide();
+            }
+    }
+    </script>
+    </html>
+</apex:page>

@@ -1,0 +1,781 @@
+<!--
+ - Created by danielpulache on 10/31/17.
+ -->
+
+<apex:page id="TaskWorkQueue" controller="TaskWorkQueueController">
+    <html xmlns="https://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <script src="{!URLFOR($Resource.aljs, '/jquery.aljs-all-with-moment.min.js')}"></script>
+    <apex:includeScript value="//code.jquery.com/jquery-2.1.1.min.js"/>
+    <apex:includeScript value="/soap/ajax/26.0/connection.js"/>
+    <apex:includeScript value="/js/functions.js"/>
+
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.css"/>
+    <!--<apex:stylesheet value="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css"/>-->
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/select/1.2.3/js/dataTables.select.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
+    <!--<apex:includeScript value="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"/>-->
+    <!--<apex:includeScript value="/resource/jQueryForPopup/jQuery/ui/jquery-ui-2.1.1.custom.min.js"/>-->
+    <!--<apex:includeScript value="/resource/jQueryForPopup/jQuery/postmessage/jquery.ba-postmessage.js"/>-->
+    <!--<apex:includeScript value="/resource/jQueryForPopup/jQuery/bbq/jquery.ba-bbq.min.js"/>-->
+    <!--<apex:stylesheet value="/resource/jQueryForPopup/jQuery/ui/css/ui-lightness/jquery-ui-2.1.1.custom.min.css"/>-->
+
+    <head>
+        <title>Requestor Queue</title>
+        <apex:slds />
+    </head>
+
+    <body>
+    <div class="slds-scope">
+        <!--<apex:form >-->
+        <!-- REQUIRED SLDS WRAPPER -->
+        <div class="slds">
+
+
+            <!-- MASTHEAD -->
+            <!-- / MASTHEAD -->
+            <!-- PAGE HEADER -->
+            <div class="slds-page-header" role="banner">
+
+                <!-- PAGE HEADER TOP ROW -->
+                <div class="slds-grid">
+
+                    <!-- PAGE HEADER / ROW 1 / COLUMN 1 -->
+                    <div class="slds-col slds-size--1-of-4">
+
+                        <!-- HEADING AREA -->
+                        <!-- MEDIA OBJECT = FIGURE + BODY -->
+                        <div class="slds-media">
+
+                            <div class="slds-media__figure">
+                                <svg aria-hidden="true" class="slds-icon slds-icon--large slds-icon-standard-user">
+                                    <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/standard-sprite/svg/symbols.svg#task')}"></use>
+                                </svg>
+                            </div>
+
+                            <div class="slds-media__body">
+                                <h2 class="slds-text-heading--medium">Requestor Queue</h2>
+                            </div>
+                        </div>
+                        <!-- / MEDIA OBJECT -->
+                        <!-- HEADING AREA -->
+                    </div>
+                    <!-- / PAGE HEADER / ROW 1 / COLUMN 1 -->
+
+                    <!-- PAGE HEADER / ROW 1 / COLUMN 2 -->
+                    <div class="slds-col slds-size--3-of-4" >
+                        <table class="slds-table">
+                            <tr>
+                                <td class="slds-size--1-of-6 slds-text-align_center" style="background-color: #f7f9fb;">
+                                    <label class="slds-form-element__label" for="wipStateId">Priority</label>
+                                    <div class="slds-form-element__control">
+                                        <div class="slds-select_container">
+                                            <select class="slds-select" id="wipStateId" >
+                                            </select>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="slds-size--1-of-6 slds-text-align_center" style="background-color: #f7f9fb;"></td>
+                                <td class="slds-size--1-of-6 slds-text-align_center" style="background-color: #f7f9fb;"></td>
+                                <td class="slds-size--1-of-6 slds-text-align_center" style="background-color: #f7f9fb;"></td>
+                                <td class="slds-size--1-of-6 slds-text-align_center" style="background-color: #f7f9fb;"></td>
+                                <td class="slds-size--1-of-6 slds-text-align_center" style="background-color: #f7f9fb;"></td>
+                            </tr>
+                        </table>
+                    </div>
+                    <!-- / PAGE HEADER / ROW 1 / COLUMN 2 -->
+                </div>
+                <!-- / PAGE HEADER TOP ROW -->
+                <!-- / PAGE HEADER DETAIL ROW -->
+                <!-- / PAGE HEADER DETAIL ROW -->
+            </div>
+        </div>
+        <c:statusMessages />
+        <!-- PRIMARY CONTENT WRAPPER -->
+        <div class="slds">
+            <!-- RELATED LIST CARDS-->
+            <div id="UrgentTaskDiv" class="slds-grid slds-m-top--large slds-m-bottom--large">
+                <div class="slds-col slds-col-rule--right slds-p-right--large slds-p-left--large slds-size--8-of-12">
+                    <div id="UrgentTaskCard" class="slds-card">
+                        <!--clay whitespace end-->
+                        <!-- / CARD BODY = SECTION + TABLE -->
+                        <header id="UrgentTaskHeader" class="slds-card__header slds-grid">
+                            <div class="slds-col slds-media slds-media&#45;&#45;center">
+                                <div class="slds-media__figure">
+                                    <svg aria-hidden="true" class="slds-icon slds-icon-standard-contact slds-icon&#45;&#45;small">
+                                        <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/standard-sprite/svg/symbols.svg#custom_notification')}"></use>
+                                    </svg>
+                                </div>
+                                <div class="slds-media__body">
+                                    <h3 class="slds-text-heading&#45;&#45;small">Urgent Requests</h3>
+                                </div>
+                            </div>
+                        </header>
+                        <section id="UrgentTaskSection" class="slds-card__body">
+                            <div  style="margin:1em;">
+                                <table id="UrgentTaskTable" class="row-border stripe" width="95%"></table>
+                                <!-- Datatable goes here -->
+                            </div>
+                        </section>
+                        <footer class="slds-card__footer">
+                            <!--<div>-->
+                            <!--<button class="slds-button slds-button&#45;&#45;neutral compact-button">Save</button>-->
+                            <!--</div>-->
+                            <!-- Warning toast: Search timed out -->
+                            <div class="toast-message" style="height: 4rem; display:none;" id="errorMessage">
+                                <div class="slds-notify_container slds-is-relative">
+                                    <div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
+                                        <span class="slds-assistive-text">Time Out Warning</span>
+                                        <span class="slds-icon_container slds-icon-utility-success slds-m-right_small slds-no-flex slds-align-top" title="Time Out">
+                                                    <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/utility-sprite/svg/symbols.svg#error')}" />
+                                                    </svg>
+                                                </span>
+                                        <div class="slds-notify__content">
+                                            <h2 class="slds-text-heading_small ">Search request timed out. Please try again.</h2>
+                                        </div>
+                                        <button class="slds-button slds-button_icon slds-notify__close slds-button_icon-inverse" type="button" id="closeTimeOutMessage" title="Close">
+                                            <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/utility-sprite/svg/symbols.svg#close')}" />
+                                            </svg>
+                                            <span class="slds-assistive-text">Close</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </footer>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-grid slds-m-top--large">
+                <div class="slds-col slds-col-rule--right slds-p-right--large slds-p-left--large slds-size--8-of-12">
+                    <div class="slds-card">
+                        <!--clay whitespace end-->
+                        <!-- / CARD BODY = SECTION + TABLE -->
+                        <header class="slds-card__header slds-grid">
+                            <div class="slds-col slds-media slds-media&#45;&#45;center">
+                                <div class="slds-media__figure">
+                                    <svg aria-hidden="true" class="slds-icon slds-icon-standard-contact slds-icon&#45;&#45;small">
+                                        <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/standard-sprite/svg/symbols.svg#client')}"></use>
+                                    </svg>
+                                </div>
+                                <div class="slds-media__body">
+                                    <h3 class="slds-text-heading&#45;&#45;small">Requests</h3>
+                                </div>
+                            </div>
+                        </header>
+                        <section class="slds-card__body">
+                            <div  style="margin:1em;">
+                                <table id="TaskWorkQueueTable" class="row-border stripe" width="95%"></table>
+                                <!-- Datatable goes here -->
+                            </div>
+                        </section>
+                        <footer class="slds-card__footer">
+                            <!--<div>-->
+                            <!--<button class="slds-button slds-button&#45;&#45;neutral compact-button">Save</button>-->
+                            <!--</div>-->
+                            <!-- Warning toast: Search timed out -->
+                            <div class="toast-message" style="height: 4rem; display:none;" id="errorMessage">
+                                <div class="slds-notify_container slds-is-relative">
+                                    <div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
+                                        <span class="slds-assistive-text">Time Out Warning</span>
+                                        <span class="slds-icon_container slds-icon-utility-success slds-m-right_small slds-no-flex slds-align-top" title="Time Out">
+                                                    <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/utility-sprite/svg/symbols.svg#error')}" />
+                                                    </svg>
+                                                </span>
+                                        <div class="slds-notify__content">
+                                            <h2 class="slds-text-heading_small ">Search request timed out. Please try again.</h2>
+                                        </div>
+                                        <button class="slds-button slds-button_icon slds-notify__close slds-button_icon-inverse" type="button" id="closeTimeOutMessage" title="Close">
+                                            <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/utility-sprite/svg/symbols.svg#close')}" />
+                                            </svg>
+                                            <span class="slds-assistive-text">Close</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </footer>
+                    </div>
+                </div>
+                <!-- / MAIN CARD -->
+                <br />
+            </div>
+            <!-- / RELATED LIST CARDS -->
+            <c:ADMPatientDetailModal />
+            <div class="slds-modal" aria-hidden="false" role="dialog" id="ADMNoteModal" >
+                <div class="slds-modal__container" style="max-width:80em; width:100%">
+                    <header class="slds-modal__header">
+                        <button id="closeADMModal" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+                            <svg class="slds-button__icon slds-button__icon_large">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/utility-sprite/svg/symbols.svg#close')}" />
+                            </svg>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 id="callLogDetail" class="slds-text-heading--medium slds-hyphenate">Patient Note</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around--large">
+                        <div class="slds-form">
+                            <div class="slds-grid">
+                                <div class="slds-size--3-of-3">
+                                    <div class="slds-form-element" style="margin-top:1em;">
+                                        <label class="slds-form-element__label" for="input-id-01"></label>
+                                        <div class="slds-form-element__control">
+                                            <article class="slds-card">
+                                                <apex:form >
+                                                    <div class="slds-card__header slds-grid">
+                                                        <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                                            <div class="slds-media__figure">
+                                                                <span class="slds-icon_container slds-icon-standard-contact" title="description of icon when needed">
+                                                                  <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/standard-sprite/svg/symbols.svg#contact')}" />
+                                                                  </svg>
+                                                                </span>
+                                                            </div>
+                                                            <div class="slds-media__body">
+                                                                <h2 class="slds-text-heading_medium" id="ADMNoteModal-ptName"></h2>
+                                                            </div>
+                                                        </header>
+                                                    </div>
+                                                    <div class="slds-form-element__control slds-grid slds-wrap slds-m-top--small">
+                                                        <div id="ADMNoteDiv" class="slds-form-element slds-size--2-of-2">
+                                                            <label class="slds-card__body slds-card__body_inner slds-form-element__label" for="ADMNoteBody"><abbr class="slds-required" title="required">*</abbr>Patient Note (required)</label>
+                                                            <div class="slds-card__body slds-card__body_inner slds-form-element__control slds-container_center" style="overflow:auto;">
+                                                                <div class="slds-select_container">
+                                                                    <textarea id="ADMNoteBody" class="slds-textarea" rows="5" />
+                                                                </div>
+                                                            </div>
+                                                            <div id="adm-note-error-message" class="slds-card__body slds-card__body_inner slds-form-element__help" style="display:none;">Please enter a Patient Note</div>
+                                                        </div>
+                                                        <div class="slds-size--1-of-2">
+                                                            <label class="slds-card__body slds-card__body_inner slds-form-element__label" for="sendToManufacturer">Send to Manufacturer?</label>
+                                                            <div class="slds-card__body slds-card__body_inner slds-form-element__control" style="height:32px;">
+                                                                <input type="checkbox" styleClass="slds-checkbox" id="sendToManufacturer" /><!-- styleclass="slds-input" -->
+                                                            </div>
+                                                        </div>
+                                                        <div id="manufacturerPicklistDiv" class="slds-size--1-of-2" style="display:none;">
+                                                            <label class="slds-form-element__label" for="manufacturerPicklist"><abbr class="slds-required" title="required">*</abbr>Manufacturer (required)</label>
+                                                            <div class="slds-form-element__control" style="overflow:auto;width:280px;">
+                                                                <div class="slds-select_container">
+                                                                    <select class="slds-input slds-select" id="manufacturerPicklist">
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div id="manufacturer-error-message" class="slds-form-element__help" style="display:none;">Please select a Manufacturer</div>
+                                                        </div>
+                                                    </div>
+                                                </apex:form>
+                                            </article>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <button class="slds-button slds-button--neutral" onClick="cancelADMNoteModal()">Cancel</button>
+                        <span id="ADMNoteSaveButton"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-backdrop" id="backdrop"></div>
+
+<!-- Location Rules Modal -->
+            <!--<c:ADMPatientDetailModal />-->
+            <div class="slds-modal" aria-hidden="false" role="dialog" id="LocationRulesModal" >
+                <div class="slds-modal__container" style="max-width:80em; width:100%">
+                    <header class="slds-modal__header">
+                        <button id="closeLocationRulesModal" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+                            <svg class="slds-button__icon slds-button__icon_large">
+                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/utility-sprite/svg/symbols.svg#close')}" />
+                            </svg>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                        <h2 id="callLogDetail" class="slds-text-heading--medium slds-hyphenate">Location Rules</h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around--large">
+                        <div class="slds-form">
+                            <div class="slds-grid">
+                                <div class="slds-size--3-of-3">
+                                    <div class="slds-form-element" style="margin-top:1em;">
+                                        <label class="slds-form-element__label" for="input-id-01"></label>
+                                        <div class="slds-form-element__control">
+                                            <article class="slds-card">
+                                                <apex:form >
+                                                    <div class="slds-card__header">
+                                                        <header class="slds-card__header">
+                                                            <!--<div class="slds-media__figure">-->
+                                                                <!--<span class="slds-icon_container slds-icon-standard-contact" title="description of icon when needed">-->
+                                                                  <!--<svg class="slds-icon slds-icon_small" aria-hidden="true">-->
+                                                                    <!--<use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/standard-sprite/svg/symbols.svg#record')}" />-->
+                                                                  <!--</svg>-->
+                                                                <!--</span>-->
+                                                            <!--</div>-->
+                                                            <!--<div class="slds-media__body">-->
+                                                                <!--<h2 class="slds-text-heading_medium" id="LocationRulesModal-ptName">Rules</h2>-->
+                                                            <!--</div>-->
+                                                        </header>
+                                                        <section class="slds-card__body">
+                                                            <div  style="margin:1em;">
+                                                                <table class="row-border stripe"  id="LocationRules-data_table">
+                                                                </table>
+                                                            </div>
+                                                        </section>
+                                                    </div>
+                                                </apex:form>
+                                            </article>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-modal__footer">
+                        <button class="slds-button slds-button--neutral" onClick="cancelLocationRulesModal()">Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <div class="slds-backdrop" id="LocationRulesModal-backdrop"></div>
+<!-- Location Rules Modal -->
+
+
+
+        </div>
+        <!--</apex:form>-->
+    </div>
+    </body>
+    <script>
+        j$ = jQuery.noConflict();
+        var table;
+        var datatableExists = false;
+        var urgentdatatableExists = false;
+        var locationRulesTableExists = false;
+        var searchString = 'all';
+        var theParam = '';
+        j$(document).ready(function(){
+            j$('#errorMessage').hide();
+            j$('#UrgentTaskDiv').hide();
+            initiateWIPStatePickList();
+            populateUrgentQueue();
+            populateWorkQueue();
+            buildManufacturerList();
+            //Search for work queue when value is changed on dropdown
+            j$('#wipStateId').change(function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                searchString = e.currentTarget.value;
+                populateUrgentQueue();
+                populateWorkQueue();
+            });
+        });
+        /*-------------------------------------------------------*/
+        // Calls remote action to populate work queue
+        /*-------------------------------------------------------*/
+        function populateWorkQueue() {
+            j$('#errorMessage').hide();
+            TaskWorkQueueController.getWorkQueueItems(
+                searchString,
+                parseResponse,
+                {escape: true}
+            );
+            return false;
+        }
+
+        function populateUrgentQueue() {
+            console.log ('urgent queue');
+            j$('#errorMessage').hide();
+            TaskWorkQueueController.getUrgentQueueItems(
+                theParam,
+                parseUrgentResponse,
+                {escape: true}
+            );
+            return false;
+        }
+
+        /*-------------------------------------------------------*/
+        // Parses the search results from the remote action and
+        // generates the data table
+        /*-------------------------------------------------------*/
+        function parseResponse(result, event){
+            if(event.status) {
+                if(datatableExists) {
+                    j$('#TaskWorkQueueTable').DataTable().destroy();
+                }
+                table = j$('#TaskWorkQueueTable').DataTable({
+                    data: result,
+                    columns: [
+                        {data: "priority", defaultContent: "&mdash;", title: "Priority"},
+                        {data: "patientName", defaultContent: "&mdash", title: "Patient",
+                            render: function(data, display, result) {
+                                return '<a href="#" id="toggleBtnProd" onClick="displayPatientModal(\''+result.patientId+'\');return false;">' + result.patientName + '</a>';
+                            }
+                        },
+                        {data: "completed", defaultContent: "&mdash;", title: "Completed",
+                            render: function(data, display, result) {
+                                if(data) {
+                                    return '<input type="checkbox" RequestId="'+result.requestId+'" checked>';
+                                } else {
+                                    return '<input type="checkbox" RequestId="'+result.requestId+'">';
+                                }
+                            }
+                        },
+                        {data: "daysInQueue", defaultContent: "&mdash;", title: "Days in Queue"},
+                        {data: "referralSource", defaultContent: "&mdash;", title: "Referral Source"},
+                        {data: "orderOwnerName", defaultContent: "&mdash;", title: "Order Owner"},
+                        {data: "assignedTo", defaultContent: "&mdash;", title: "Assigned To"},
+                        {data: "conduitId", defaultContent: "&mdash;", title: "Open Conduit Templates",
+                            render: function(data, display, result) {
+                                return '<button class="slds-button slds-button--brand" onClick="displayConduit(\''+result.requestId+'\', \''+result.assignedTo+'\'); return false;">Conduit</button>';
+                            }
+                        },
+                        {data: "", defaultContent: "&mdash;", title: "ADM Request",
+                            render: function(data, display, result) {
+                                return '<button class="slds-button slds-button--brand" onClick="displayADMNoteModal(\'' + result.patientId + '\', \'' + result.requestId + '\');return false;">Add Note</button>';
+                            }
+                        }, //#158009672/#158017071 Location Rules
+                        {data: "hasLocationRules", defaultContent: "&mdash;", title: "Location Rules",
+                            render: function(data, display, result) {
+                                if (data == true) return '<button class="slds-button slds-button--destructive" onClick="displayLocationRulesModal(\'' + result.locationId + '\', \'' + result.requestId + '\');return false;">Rules</button>';
+                                else return '<button class="slds-button slds-button--neutral" disabled="true">Rules</button>';
+                            }
+                        }
+                    ],
+                    select: false
+                });
+                datatableExists = true;
+                WorkQueueTaskCompleted();
+            } else if (event.type === 'exception') {
+                console.log('Exception happened');
+                console.log('EXCEPTION: ' + event.statuscode);
+                console.log(event);
+                // if(event.statusCode == 400){
+                    j$('#errorMessage').show();
+                // }
+            } else {
+                console.log('NOTHING HAPPENED');
+            }
+        }
+
+        /*-------------------------------------------------------*/
+        // Parses the search results from the remote action and
+        // generates the Urgent Requests data table
+        /*-------------------------------------------------------*/
+        function parseUrgentResponse(result, event){
+            if(event.status) {
+                if(urgentdatatableExists) {
+                    j$('#UrgentTaskTable').DataTable().destroy();
+                }
+                if(!isEmpty(result)){
+                    table = j$('#UrgentTaskTable').DataTable({
+                        data: result,
+                        columns: [
+                            {data: "priority", defaultContent: "&mdash", title: "Priority"},
+                            {data: "patientId", defaultContent: "&mdash", title: "Patient",
+                                render: function(data, display, result) {
+                                    return '<a href="#" id="toggleBtnProd" onClick="displayPatientModal(\''+result.patientId+'\');return false;">' + result.patientName + '</a>';
+                                }
+                            },
+                            {data: "providerName", defaultContent: "&mdash;", title: "Provider"},
+                            {data: "taskstatus", defaultContent: "&mdash;", title: "Completed",
+                                render: function(data, display, result) {
+                                    if(data) {
+                                        return '<input type="checkbox" thetaskid="'+result.taskId+'" checked>';
+                                    } else {
+                                        return '<input type="checkbox" thetaskid="'+result.taskId+'">';
+                                    }
+                                }
+                            },
+                            {data: "hoursopen", defaultContent: "&mdash;", title: "Days in Queue"},
+                            {data: "tasktype", defaultContent: "&mdash;", title: "Task Type"},
+                            {data: "urgentReason", defaultContent: "&mdash;", title: "Reason"},
+                            {data: "assignedTo", defaultContent: "&mdash;", title: "Assigned To"},
+                            {data: "conduitId", defaultContent: "&mdash;", title: "Open Conduit Templates",
+                                render: function(data) {
+                                    return '<button class="slds-button slds-button--brand" onClick="displayConduit(\''+result.requestId+'\', \''+result.assignedTo+'\');return false;">Conduit</button>';
+                                }
+                            },
+                            {data: "", defaultContent: "&mdash;", title: "ADM Request",
+                                render: function(data, display, result) {
+                                    return '<button class="slds-button slds-button--brand" onClick="displayADMNoteModal(\'' + result.patientId + '\', \'' + result.requestId + '\');return false;">Add Note</button>';
+                                }
+                            }, //#158009672/#158017071 Location Rules
+                            {data: "hasLocationRules", defaultContent: "&mdash;", title: "Location Rules",
+                                render: function(data, display, result) {
+                                    if (data == true) return '<button class="slds-button slds-button--destructive" onClick="displayLocationRulesModal(\'' + result.locationId + '\', \'' + result.requestId + '\');return false;">Rules</button>';
+                                    else return '<button class="slds-button slds-button--neutral" disabled="true">Rules</button>';
+                            }
+                        }
+                        ],
+                        select: false,
+                        paging: false
+                    });
+                    console.log ('table exists');
+                    j$('#UrgentTaskDiv').show();
+                    urgentdatatableExists = true;
+                    UrgentQueueTaskCompleted();
+                }
+            } else if (event.type === 'exception') {
+                console.log('Exception happened');
+                console.log('EXCEPTION: ' + event.statuscode);
+                console.log(event);
+                    j$('#errorMessage').show();
+            } else {
+                console.log('NOTHING HAPPENED');
+            }
+        }
+        /*----------------------------------------------------------*/
+        // Call updateRequest function from the controller when the
+        // a checkbox is changed
+        /*----------------------------------------------------------*/
+        function WorkQueueTaskCompleted() {
+            j$('#TaskWorkQueueTable').on('change', "input[type='checkbox']", function(e) {
+                console.log('completed checkbox changed');
+
+                TaskWorkQueueController.updateRequest(
+                j$(this).attr('requestid'),j$(this)[0].checked,
+                    function(result, event){
+                        console.log('updateRequest');
+                        console.log(event);
+                    },
+                    {escape: true}
+                );
+                populateWorkQueue();
+            });
+        }
+
+        function displayConduit(theReq, theOwner) {
+            var currentUserName = '{!$User.FirstName} {!$User.LastName}';
+            console.log('Req: ' + theReq);
+            console.log('Owner: ' + theOwner);
+            console.log('typeof theOwner: '+typeof theOwner);
+            console.log('typeof theOwner == undefined: ' + typeof theOwner == undefined);
+            console.log("typeof theOwner == 'undefined': " + typeof theOwner == 'undefined');
+
+            // Req Id exists, theOwner exists, and the owner is not the current running user
+            if (theReq != 'undefined' && theOwner != 'undefined' && theOwner != currentUserName) {
+                var takeOver = confirm(theOwner + ' is already working on this request. Do you want to continue?');
+                if (takeOver == true) {
+                    console.log('Yep');
+                    TaskWorkQueueController.updateRequestOwner(
+                        theReq,
+                        function(result, event){
+                            console.log(event);
+                            populateWorkQueue();
+                            popitup('http://www.conduitoffice.com','cond');
+                        },
+                        {escape: true}
+                    );
+                }
+            } else if (theReq != 'undefined' && theOwner == 'undefined'){
+                console.log('Ownerless update request');
+                TaskWorkQueueController.updateRequestOwner(
+                        theReq,
+                        function(result, event){
+                            console.log(event);
+                            populateWorkQueue();
+                            popitup('http://www.conduitoffice.com','cond');
+                        },
+                        {escape: true}
+                    );
+            } else {
+                console.log('Pop up only');
+                popitup('http://www.conduitoffice.com','cond');
+            }
+        }
+
+        function popitup(url,windowName) {
+            newwindow=window.open(url,windowName,'height=800,width=1200');
+            if (window.focus) {newwindow.focus()}
+            return false;
+        }
+
+        function UrgentQueueTaskCompleted() {
+            j$('#UrgentTaskTable').on('change', "input[type='checkbox']", function(e) {
+                TaskWorkQueueController.updateTask(
+                j$(this).attr('thetaskid'),j$(this)[0].checked,
+                    function(result, event){
+                        console.log(event);
+                    },
+                    {escape: true}
+                );
+                populateUrgentQueue();
+            });
+        }
+
+        function initiateWIPStatePickList() {
+            var $wipStatePicklist = j$('#wipStateId');
+            TaskWorkQueueController.getWIPStateOptions(function(result, event) {
+                if (result) {
+                    result.map(function(value) {
+                        $wipStatePicklist.append(
+                            j$('<option></option>').attr('value', value).attr('label', value)
+                        );
+                    });
+                }
+            });
+        }
+
+        function displayADMNoteModal(ptId, reqId) {
+            TaskWorkQueueController.getPatientNameForADMNoteModal(ptId, function(result, err) {
+                var saveButton = '<button class="slds-button slds-button--brand" onClick="save(\'' + ptId + '\', \'' + reqId + '\')">Save</button>';
+                j$('#ADMNoteSaveButton').html(saveButton);
+                if (result.Name != null) j$('#ADMNoteModal-ptName').text(result.Name)
+                    else j$('#ADMNoteModal-ptName').text('–');
+                resetForm();
+                j$('#ADMNoteModal').addClass('slds-fade-in-open');
+                j$('#backdrop').addClass('slds-backdrop--open');
+            });
+        }
+
+        //#158009672/#158017071 Location Rules
+        function displayLocationRulesModal(locationId, reqId) {
+            TaskWorkQueueController.getLocationRules(
+                locationId,
+                fillLocationRuleTable,
+                {escape: true}
+            );
+            return false;
+        }
+
+        function fillLocationRuleTable(result, event){
+            console.log('Display the Location Rules');
+
+            if (locationRulesTableExists) {
+                j$('#LocationRules-data_table').DataTable().destroy();
+            }
+            if(event.status){
+                console.log('building the location rules table');
+                table = j$('#LocationRules-data_table').DataTable({
+                    data: result,
+                    columns: [
+                        {data: "Provider_Rule_Type__c", defaultContent: "&mdash;", title: "Provider Rule Type"},
+                        {data: "Value__c", defaultContent: "&mdash;", title: "Value"},
+                        {data: "Required__c", defaultContent: "", title: "Required", render:
+                            function ( data, type, row ) {
+                                if ( data ) { //type === 'display' ) {
+                                    return '<input type="checkbox" disabled="disabled" checked="checked"/>';
+                                }
+                                return '<input type="checkbox" disabled="disabled"/>';
+                            },
+                    }],
+                    select: false,
+                    paging: false
+                });
+                console.log ('location rules table exists');
+                locationRulesTableExists = true;
+            }
+
+            j$('#LocationRulesModal').addClass('slds-fade-in-open');
+            j$('#LocationRulesModal-backdrop').addClass('slds-backdrop--open');
+        }
+
+
+        function cancelLocationRulesModal() {
+            j$('#LocationRulesModal').removeClass('slds-fade-in-open');
+            j$('#LocationRulesModal-backdrop').removeClass('slds-backdrop--open');
+            resetForm();
+        }
+        j$('#closeLocationRulesModal').click(function(e) {
+            e.preventDefault();
+            j$('#LocationRulesModal').removeClass('slds-fade-in-open');
+            j$('#LocationRulesModal-backdrop').removeClass('slds-backdrop--open');
+        });
+
+        function buildManufacturerList() {
+            var $manufacturerList = j$('#manufacturerPicklist');
+            TaskWorkQueueController.getManufacturerList(function(result, event) {
+                if (result) {
+                    result.map(function(type) {
+                        $manufacturerList.append(
+                            j$('<option></option>').attr('value', type).attr('label', type)
+                        );
+                    });
+                }
+            });
+        }
+
+        j$('#sendToManufacturer').click(function(e) {
+            if(j$('#sendToManufacturer').is(':checked')) {
+                j$('#manufacturerPicklistDiv').show();
+            } else {
+                j$('#manufacturerPicklistDiv').hide();
+                j$('#manufacturerPicklist').find('option:first').prop('selected', true);
+            }
+        });
+
+        j$('#closeADMModal').click(function(e) {
+            e.preventDefault();
+            j$('#ADMNoteModal').removeClass('slds-fade-in-open');
+            j$('#backdrop').removeClass('slds-backdrop--open');
+            resetForm();
+        });
+
+        function cancelADMNoteModal() {
+            j$('#ADMNoteModal').removeClass('slds-fade-in-open');
+            j$('#backdrop').removeClass('slds-backdrop--open');
+            resetForm();
+        }
+
+        function save(ptId, reqId){
+            if(reqId == 'undefined') reqId = null;
+
+            var note = j$('#ADMNoteBody').val();
+            var sendToManufacturer = j$('#sendToManufacturer').is(":checked");
+            var manufacturer = j$('#manufacturerPicklist option:selected').val() == '–' ? null : j$('#manufacturerPicklist option:selected').val();
+            var areErrors = false;
+
+            if(note == '') {
+                j$('#ADMNoteDiv').addClass('slds-has-error');
+                j$('#adm-note-error-message').show();
+                areErrors = true;
+            }
+
+            if(sendToManufacturer == true && manufacturer == null) {
+                j$('#manufacturerPicklistDiv').addClass('slds-has-error');
+                j$('#manufacturer-error-message').show();
+                areErrors = true;
+            }
+
+            if(!areErrors) {
+                TaskWorkQueueController.saveADMNote(ptId, reqId, note, sendToManufacturer, manufacturer, function(result, event) {
+                        console.log(event);
+                            j$('#ADMNoteModal').removeClass('slds-fade-in-open');
+                            j$('#backdrop').removeClass('slds-backdrop--open');
+                            resetForm();
+                        if (result != 'Success'){
+                            j$('#errorMsg').text(result);
+                            j$('#errorMsgDiv').show();
+                        } else {
+                            j$('#ADMNoteModal').removeClass('slds-fade-in-open');
+                            j$('#backdrop').removeClass('slds-backdrop--open');
+                            resetForm();
+                            j$('#successMsg').text('ADM Note Created');
+                            j$('#successMsgDiv').show();
+                        }
+                        return false;
+                });
+            }
+        }
+
+        function resetForm(){
+            j$('#ADMNoteBody').val('');
+            j$('#sendToManufacturer').prop('checked', false) // Set checkbox to false
+            j$('#manufacturerPicklist').find('option:first').prop('selected', true)
+            j$('#errorMsgDiv').hide();
+            j$('#successMsgDiv').hide();
+            j$("div[id$='error-message']").hide();
+            j$("div[id$='Div']").removeClass('slds-has-error');
+
+        }
+
+        function isEmpty(obj) {
+            for(var key in obj) {
+                if(obj.hasOwnProperty(key))
+                    return false;
+            }
+            return true;
+        }
+    </script>
+    </html>
+</apex:page>

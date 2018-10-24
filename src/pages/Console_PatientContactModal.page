@@ -1,0 +1,470 @@
+<apex:page showHeader="false" standardStylesheets="false" sidebar="false" applyHtmlTag="false" applyBodyTag="false" docType="html-5.0" standardController="Opportunity">    
+
+<html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> 
+  <apex:includeScript value="/soap/ajax/26.0/connection.js"/>
+  <apex:includeScript value="/js/functions.js"/>
+  <apex:includeScript value="/resource/jQueryForPopup/jQuery/jquery-1.8.2.min.js"/>
+  <apex:includeScript value="/resource/jQueryForPopup/jQuery/ui/jquery-ui-1.9.1.custom.min.js"/>
+  <apex:includeScript value="/resource/jQueryForPopup/jQuery/postmessage/jquery.ba-postmessage.js"/>
+  <apex:includeScript value="/resource/jQueryForPopup/jQuery/bbq/jquery.ba-bbq.min.js"/>
+  <apex:stylesheet value="/resource/jQueryForPopup/jQuery/ui/css/ui-lightness/jquery-ui-1.9.1.custom.min.css"/>
+
+  <apex:includeScript value="/support/console/36.0/integration.js"/>   
+<head>
+  <title>Patients &amp; Contacts</title>
+  <apex:slds />
+</head>
+<script>
+    function displayResponsible(value){
+        if(value==false){
+            document.getElementById('responsiblePartySpan').style.display='';  
+        }else{
+            document.getElementById('responsiblePartySpan').style.display='none';
+        }
+    }
+    
+    function displayPrimary(value){
+        if(value==false){
+            document.getElementById('primarySpan').style.display='';  
+        }else{
+            document.getElementById('primarySpan').style.display='none';
+        }
+    }
+</script>    
+
+<body>    
+
+  <!-- REQUIRED SLDS WRAPPER -->
+  <div class="slds-scope">    
+      <div class="slds-modal-large">
+        <div class="modal-container">
+    <!-- MASTHEAD -->
+        <div class="modal-header slds-modal__header">
+            <h2 class="title slds-text-heading--medium" style="padding-bottom:1em;">Patients &amp; Contacts</h2>
+        </div>
+        <!-- / MASTHEAD -->    
+    
+        <!-- PRIMARY CONTENT WRAPPER -->
+        <apex:form >
+        <div class="slds-form">
+            <h3 class="slds-section__title slds-theme--shade primaryPaletteBorder">
+                <span class="section-header-title slds-p-horizontal--small slds-truncate">Patient Details</span>
+            </h3>
+            <div class="slds-grid" style="margin:1em;"> 
+            <div class="slds-size--1-of-3">
+                <div class="slds-form-element" style="margin-top:1em;">
+                    <label class="slds-form-element__label" for="input-id-01">Preferred Name</label>
+                    <div class="slds-form-element__control">
+                        <input type="text" value="Brad" class="slds-input"/>
+<!--                         <input type="text" id="input-id-01" class="slds-input"/> -->
+                    </div>
+                </div>
+                <div class="slds-form-element" style="margin-top:1em;">
+                    <label class="slds-form-element__label" for="input-id-02">First Name</label>
+                    <div class="slds-form-element__control">
+                        <input type="text" value="Brad" id="input-id-02" class="slds-input"/>
+                    </div>
+                </div>
+                <div class="slds-form-element" style="margin-top:1em;">
+                    <label class="slds-form-element__label" for="input-id-03">Last Name</label>
+                    <div class="slds-form-element__control">
+                        <input type="text" value="Jambura" id="input-id-03" class="slds-input"/>
+                    </div>
+                </div>
+                <div class="slds-form-element" style="margin-top:1em;">
+                    <label class="slds-form-element__label" for="input-id-04">Date of Birth</label>
+                    <div class="slds-form-element__control">
+                        <input type="text" value="03/02/1985" id="input-id-04" class="slds-input"/>
+                    </div>
+                </div>
+            </div>
+                
+            <div class="slds-size--1-of-3" style="margin:1em;">
+                <div class="slds-form-element" >
+                    <label class="slds-form-element__label" for="input-id-05">Status</label>
+                    <div class="slds-form-element__control">
+                        <input type="text" value="Active" id="input-id-05" class="slds-input"/>
+                    </div>
+                </div>
+                <div class="slds-size--1-of-1" style="margin:1em;">
+                    <div class="slds-grid slds-wrap">
+                    	<div class="slds-size--1-of-2">
+                            <div class="slds-form-element">
+                                <label class="slds-form-element__label" for="input-id-06">Responsible Party</label>
+                                <div class="slds-form-element__control">
+                                    <input type="checkbox" id="input-id-06" onchange="displayResponsible(this.checked)" class="slds-input" style="height:30px;"/>
+                                    <!-- <apex:inputCheckbox id="responsibleParty" onchange="displaydiv(this.value)" value="{!a.Account_Type__c}" label="Responsible Party" styleClass="form-control"/> -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-size--1-of-2">
+                            <div class="slds-form-element">
+                                <label class="slds-form-element__label" for="input-id-07">Primary Contact</label>
+                                <div class="slds-form-element__control">
+                                    <input type="checkbox" id="input-id-07" onchange="displayPrimary(this.checked)" class="slds-input" style="height:30px;"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-form-element" style="margin-top:1em;">
+                    <label class="slds-form-element__label" for="input-id-08">Gender</label>
+                    <div class="slds-form-element__control">
+                        <input type="text" id="input-id-08" value="Male" class="slds-input"/>
+                    </div>
+                </div>
+             </div>
+            <div class="slds-size--1-of-3" style="margin:1em;">
+                <div class="slds-form-element">
+                    <label class="slds-form-element__label" for="input-id-10">Preferred Communication</label>
+                    <div class="slds-form-element__control">
+                        <input type="text" value="Email" id="input-id-10" class="slds-input"/>
+                    </div>
+                </div>
+                <div class="slds-form-element" style="margin-top:1em;">
+                    <label class="slds-form-element__label" for="input-id-11">Email</label>
+                    <div class="slds-form-element__control">
+                        <input type="text" value="brad@solara.com" id="input-id-11" class="slds-input"/>
+                    </div>
+                </div>
+                <div class="slds-form-element" style="margin-top:1em;">
+                    <label class="slds-form-element__label" for="input-id-12">Mobile Phone</label>
+                    <div class="slds-form-element__control">
+                        <input type="text" value="619-444-1212" id="input-id-12" class="slds-input"/>
+                    </div>
+                </div>
+                <div class="slds-form-element" style="margin-top:1em;">
+                    <label class="slds-form-element__label" for="input-id-13">Home Phone</label>
+                    <div class="slds-form-element__control">
+                        <input type="text" value="619-444-1212" id="input-id-13" class="slds-input"/>
+                    </div>
+                </div>
+            </div>
+            </div>
+            <div class="slds-grid" style="margin:1em;">
+                <div class="slds-size--1-of-2" style="margin:1em;">
+                    <h4>Primary Delivery Address</h4>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-14">Street</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" value="1000 Solara Drive" id="input-id-14" class="slds-input"/>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-wrap">
+                        <div class="slds-form-element slds-size--2-of-4" style="margin-top:1em; padding-right:1em;">
+                            <label class="slds-form-element__label" for="input-id-15">City</label>
+                            <div class="slds-form-element__control">
+                                <input type="text" value="Chula Vista" id="input-id-15" class="slds-input"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-size--1-of-4" style="margin-top:1em; padding-right:1em;">
+                            <label class="slds-form-element__label" for="input-id-16">State</label>
+                            <div class="slds-form-element__control">
+                                <input type="text" value="CA" id="input-id-16" class="slds-input"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-size--1-of-4" style="margin-top:1em;">
+                            <label class="slds-form-element__label" for="input-id-17">Zip</label>
+                            <div class="slds-form-element__control">
+                                <input type="text" value="92145" id="input-id-17" class="slds-input"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-size--1-of-2" style="margin:1em;">
+                    <h4>Primary Billing Address</h4>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-18">Street</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" value="1000 Solara Drive" id="input-id-18" class="slds-input"/>
+                        </div>
+                    </div>
+                    <div class="slds-grid slds-wrap">
+                        <div class="slds-form-element slds-size--2-of-4" style="margin-top:1em; padding-right:1em;">
+                            <label class="slds-form-element__label" for="input-id-18">City</label>
+                            <div class="slds-form-element__control">
+                                <input type="text" value="Chula Vista" id="input-id-18" class="slds-input"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-size--1-of-4" style="margin-top:1em; padding-right:1em;">
+                            <label class="slds-form-element__label" for="input-id-19">State</label>
+                            <div class="slds-form-element__control">
+                                <input type="text" value="CA" id="input-id-19" class="slds-input"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-size--1-of-4" style="margin-top:1em;">
+                            <label class="slds-form-element__label" for="input-id-20">Zip</label>
+                            <div class="slds-form-element__control">
+                                <input type="text" value="92145" id="input-id-20" class="slds-input"/>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <span id="responsiblePartySpan">
+                <h3 class="slds-section__title slds-theme--shade primaryPaletteBorder">
+                    <span class="section-header-title slds-p-horizontal--small slds-truncate">Responsible Party</span>
+                </h3>
+                <div class="slds-grid" style="margin:1em;"> 
+                <div class="slds-size--1-of-3">
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-22">Preferred Name</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="input-id-22" class="slds-input"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-23">First Name</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="input-id-23" class="slds-input"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-24">Last Name</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="input-id-24" class="slds-input"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-25">Date of Birth</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="input-id-25" class="slds-input"/>
+                        </div>
+                    </div>
+                </div>
+                    
+                <div class="slds-size--1-of-3" style="margin:1em;">
+                    <div class="slds-form-element" >
+                        <label class="slds-form-element__label" for="input-id-26">Status</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="input-id-26" class="slds-input"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-28">Primary Contact</label>
+                        <div class="slds-form-element__control">
+                            <input type="checkbox" id="input-id-28" class="slds-input" style="height:30px;"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-29">Gender</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="input-id-29" class="slds-input"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-30">Relationship to Patient</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="input-id-30" class="slds-input"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-size--1-of-3" style="margin:1em;">
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label" for="input-id-31">Preferred Communication</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="input-id-31" class="slds-input"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-32">Email</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="input-id-32" class="slds-input"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-33">Mobile Phone</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="input-id-33" class="slds-input"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-34">Home Phone</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="input-id-34" class="slds-input"/>
+                        </div>
+                    </div>
+                </div>
+                </div>
+                <!-- <div class="slds-grid" style="margin:1em;" id="responsiblePartyAddress">
+                    <div class="slds-size--1-of-2" style="margin:1em;">
+                        <h4>Address</h4>
+                        <div class="slds-form-element" style="margin-top:1em;">
+                            <label class="slds-form-element__label" for="input-id-35">Street</label>
+                            <div class="slds-form-element__control">
+                                <input type="text" id="input-id-35" class="slds-input"/>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-wrap">
+                            <div class="slds-form-element slds-size--2-of-4" style="margin-top:1em; padding-right:1em;">
+                                <label class="slds-form-element__label" for="input-id-36">City</label>
+                                <div class="slds-form-element__control">
+                                    <input type="text" value="Chula Vista" id="input-id-36" class="slds-input"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-size--1-of-4" style="margin-top:1em; padding-right:1em;">
+                                <label class="slds-form-element__label" for="input-id-37">State</label>
+                                <div class="slds-form-element__control">
+                                    <input type="text" value="CA" id="input-id-37" class="slds-input"/>
+                                </div>
+                            </div>
+                            <div class="slds-form-element slds-size--1-of-4" style="margin-top:1em;">
+                                <label class="slds-form-element__label" for="input-id-38">Zip</label>
+                                <div class="slds-form-element__control">
+                                    <input type="text" value="92145" id="input-id-38" class="slds-input"/>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+            </span>
+            <span id="primarySpan">
+                <h3 class="slds-section__title slds-theme--shade primaryPaletteBorder">
+                    <span class="section-header-title slds-p-horizontal--small slds-truncate">Primary Contact</span>
+                </h3>
+                <div class="slds-grid" style="margin:1em;"> 
+                <div class="slds-size--1-of-3">
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-39">Preferred Name</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="input-id-39" class="slds-input"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-40">First Name</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="input-id-40" class="slds-input"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-41">Last Name</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="input-id-41" class="slds-input"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-42">Date of Birth</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="input-id-42" class="slds-input"/>
+                        </div>
+                    </div>
+                </div>
+                    
+                <div class="slds-size--1-of-3" style="margin:1em;">
+                    <div class="slds-form-element" >
+                        <label class="slds-form-element__label" for="input-id-43">Status</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="input-id-43" class="slds-input"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-44">Responsible Party</label>
+                        <div class="slds-form-element__control">
+                            <input type="checkbox" id="input-id-44" class="slds-input" style="height:30px;"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-46">Gender</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="input-id-46" class="slds-input"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-47">Relationship to Patient</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="input-id-47" class="slds-input"/>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-size--1-of-3" style="margin:1em;">
+                    <div class="slds-form-element">
+                        <label class="slds-form-element__label" for="input-id-48">Preferred Communication</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="input-id-48" class="slds-input"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-49">Email</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="input-id-49" class="slds-input"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-50">Mobile Phone</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="input-id-50" class="slds-input"/>
+                        </div>
+                    </div>
+                    <div class="slds-form-element" style="margin-top:1em;">
+                        <label class="slds-form-element__label" for="input-id-51">Home Phone</label>
+                        <div class="slds-form-element__control">
+                            <input type="text" id="input-id-51" class="slds-input"/>
+                        </div>
+                    </div>
+                </div>
+                </div>
+                <!-- <div class="slds-grid" style="margin:1em;">
+                    <div class="slds-size--1-of-2" style="margin:1em;">
+                        <h4>Address</h4>
+                        <div class="slds-form-element" style="margin-top:1em;">
+                            <label class="slds-form-element__label" for="input-id-52">Street</label>
+                            <div class="slds-form-element__control">
+                                <input type="text" id="input-id-52" class="slds-input"/>
+                            </div>
+                        </div>
+                        <div class="slds-grid slds-wrap">
+                        <div class="slds-form-element slds-size--2-of-4" style="margin-top:1em; padding-right:1em;">
+                            <label class="slds-form-element__label" for="input-id-53">City</label>
+                            <div class="slds-form-element__control">
+                                <input type="text" value="Chula Vista" id="input-id-53" class="slds-input"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-size--1-of-4" style="margin-top:1em; padding-right:1em;">
+                            <label class="slds-form-element__label" for="input-id-54">State</label>
+                            <div class="slds-form-element__control">
+                                <input type="text" value="CA" id="input-id-54" class="slds-input"/>
+                            </div>
+                        </div>
+                        <div class="slds-form-element slds-size--1-of-4" style="margin-top:1em;">
+                            <label class="slds-form-element__label" for="input-id-55">Zip</label>
+                            <div class="slds-form-element__control">
+                                <input type="text" value="92145" id="input-id-55" class="slds-input"/>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                </div> -->
+            </span>
+            
+        </div>
+        </apex:form>
+    
+   
+        <!-- / PRIMARY CONTENT WRAPPER -->    
+        <div class="modal-footer slds-modal__footer">
+            <button class="slds-button slds-button--neutral" type="button" title="Cancel"><span class=" label bBody truncate" >Cancel</span></button>
+            <button class="slds-button slds-button--neutral" type="button" title="Save"><span class="label bBody truncate">Save</span></button>
+        </div>
+      </div>
+      </div>
+  </div>
+  <!-- / REQUIRED SLDS WRAPPER -->    
+
+</body>
+<script>
+j$ = jQuery.noConflict();
+
+//Modal Open
+j$('#toggleBtn').click(function(){
+  j$('#backdrop').addClass('slds-backdrop--open');
+  j$('#modal').addClass('slds-fade-in-open');
+});
+
+//Modal Close
+function closeModal(){
+  j$('#modal').removeClass('slds-fade-in-open');
+  j$('#backdrop').removeClass('slds-backdrop--open');
+}
+</script>
+</html>
+</apex:page>

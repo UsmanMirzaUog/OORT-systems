@@ -1,0 +1,975 @@
+<apex:page showHeader="false" standardStylesheets="false" sidebar="false" applyHtmlTag="false" applyBodyTag="false" docType="html-5.0" standardController="Opportunity" extensions="extConsole_OpportunityDetail">
+
+    <!-- <link rel="stylesheet" href="https://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css" type="text/css" media="all" /> -->
+
+    <!-- First get JQuery -->
+    <!-- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script> -->
+    <!-- Then get JQuery UI -->
+    <!-- <script src="https://code.jquery.com/ui/1.8.18/jquery-ui.min.js"></script> -->
+    <script src="{!URLFOR($Resource.aljs, '/jquery.aljs-all-with-moment.min.js')}"></script>
+    <html xmlns="https://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"> 
+    <apex:includeScript value="/soap/ajax/26.0/connection.js"/>
+    <apex:includeScript value="/js/functions.js"/>
+    <apex:includeScript value="/support/console/36.0/integration.js"/>    
+    <apex:includeScript value="//code.jquery.com/jquery-2.1.1.min.js"/>
+    <apex:includeScript value="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"/>
+    <apex:includeScript value="/support/console/36.0/integration.js"/> 
+    <apex:stylesheet value="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css"/>
+
+
+<head>
+  <title>Page Title</title>
+  <apex:slds />
+
+</head>    
+
+   <body>
+   <apex:outputPanel rendered="{!IF(showPage==false,true,false)}">
+       <div class="slds-scope">
+            <div class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert">
+              <span class="slds-assistive-text">error</span>
+              <span class="slds-icon_container slds-icon-utility-ban slds-m-right_x-small" title="Description of icon when needed">
+                <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                  <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/utility-sprite/svg/symbols.svg#ban')}" />
+                </svg>
+              </span>
+              <h2>There is no Patient attached to this Opportunity.  Can not continue. </h2>
+              <button class="slds-button slds-button_icon slds-notify__close slds-button_icon-inverse" title="Close">
+                <svg class="slds-button__icon" aria-hidden="true">
+                  <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/utility-sprite/svg/symbols.svg#close')}" />
+                </svg>
+                <span class="slds-assistive-text">Close</span>
+              </button>
+            </div>
+        </div>
+
+
+       <!--<script type="text/javascript">-->
+               <!--var j$ = jQuery.noConflict();-->
+                <!--j$(document).ready(function(){-->
+                    <!--setTabTitle();-->
+                    <!--//Typing return in the input text box activates the search button-->
+                <!--});-->
+               <!--function setTabTitle() {-->
+                <!--//Set the current tab's title-->
+                    <!--sforce.console.setTabTitle('No Account');-->
+            <!--}-->
+       <!--</script>-->
+
+   </apex:outputPanel>
+   <apex:outputPanel rendered="{!showPage}">
+   
+  
+   
+   
+   <div class="slds-scope">
+        <div class="slds-tabs--scoped">
+            <ul class="slds-tabs--scoped__nav" role="tablist">
+                <li class="slds-tabs--scoped__item slds-active" title="Location Detail" role="presentation"><a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-scoped-1" id="tab-scoped-1__item">Opportunity Products</a></li>
+                <li class="slds-tabs--scoped__item" title="Location Feed" role="presentation"><a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-2" id="tab-scoped-2__item">Sales History</a></li>
+            </ul>
+
+            <div id="tab-scoped-1" class="slds-tabs--scoped__content slds-show" role="tabpanel" aria-labelledby="tab-scoped-1__item">
+                <apex:form >
+                    <!-- REQUIRED SLDS WRAPPER -->
+                    <div class="slds">
+                    
+                    <apex:actionFunction action="{!docSetRequest}" name="refreshDocSetReq" reRender="docTypeReq">
+                         <apex:param name="salesorderid" assignTo="{!salesorderid}" value="" />
+                    </apex:actionFunction>
+                    
+                    <apex:actionFunction action="{!saveDocSetRequest}" name="saveDocSetReq" reRender="out">
+                    </apex:actionFunction>
+                    
+                    <apex:actionFunction action="{!createDocSetRequest}" name="createDocSetReq" reRender="out">
+                    </apex:actionFunction>
+                    
+                     <div class="slds-scope" >
+                        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" id="modelPopup" class="slds-modal slds-fade-in-close">
+                            <div class="slds-modal__container">
+                                <header class="slds-modal__header">
+                                    <button type="button" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" onClick="closeModelPopup(); return false;" title="Close">
+                                    X<span class="slds-assistive-text">Close</span>
+                                    </button>
+                                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Notes</h2>
+                                </header>
+                                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="text-input-id-1">Reason Notes</label>
+                                    <div class="slds-form-element__control">
+                                        <apex:inputTextarea value="{!OppNotes1}" style="width:300px"/>
+                                    </div>
+                                </div>
+                                </div>
+                                <footer class="slds-modal__footer slds-modal__footer_directional">
+                                    <button type="button" class="slds-button slds-button--neutral " title="Save" onclick="saveDocSetReq(); return false;">Save</button>
+                                   <!--<apex:commandButton value="Save" action="{!saveDocSetRequest}" styleClass="slds-button slds-button_brand"/>-->
+                                </footer>
+                            </div>
+                        </section>
+                        
+                        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" id="modelPopup1" class="slds-modal slds-fade-in-close">
+                            <div class="slds-modal__container">
+                                <header class="slds-modal__header">
+                                    <button type="button" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" onClick="closeModelPopup1(); return false;" title="Close">
+                                    X<span class="slds-assistive-text">Close</span>
+                                    </button>
+                                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Notes</h2>
+                                </header>
+                                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                <div class="slds-form-element">
+                                    <label class="slds-form-element__label" for="text-input-id-1">Reason Notes</label>
+                                    <div class="slds-form-element__control">
+                                        <apex:inputTextarea value="{!OppNotes}" style="width:300px"/>
+                                    </div>
+                                </div>
+                                </div>
+                                <footer class="slds-modal__footer slds-modal__footer_directional">
+                                    <button type="button" class="slds-button slds-button--neutral " title="Save" onclick="createDocSetReq(); return false;">Save</button>
+                                    <!--<apex:commandButton value="Save" action="{!createDocSetRequest}" styleClass="slds-button slds-button_brand" />-->
+                                </footer>
+                            </div>
+                        </section>
+                        
+                        <div class="slds-backdrop slds-backdrop_close" id="backgroundFad"></div>
+                        </div>
+                    
+                    
+                        
+                        <!--  
+                            <apex:commandButton style="float: right;margin-top: -5%;margin-right: 9%;" styleClass="slds-button slds-button--neutral compact-button" action="{!refreshDocSetRequest}" value="Refresh DocSet" reRender="docTypeReq"/> -->
+
+                        <!-- MASTHEAD -->
+                        <!-- / MASTHEAD -->
+                        <!-- PAGE HEADER -->
+                        <div class="slds-page-header" role="banner">
+
+                            <!-- PAGE HEADER TOP ROW -->
+                            <div class="slds-grid">
+
+                                <!-- PAGE HEADER / ROW 1 / COLUMN 1 -->
+                                <div class="slds-col slds-size--1-of-10">
+
+                                    <!-- HEADING AREA -->
+                                    <!-- MEDIA OBJECT = FIGURE + BODY -->
+                                    <div class="slds-media">
+                                        <div class="slds-media__figure">
+                                            <svg aria-hidden="true" class="slds-icon slds-icon--large slds-icon-standard-user">
+                                                <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/standard-sprite/svg/symbols.svg#user')}"></use>
+                                            </svg>
+                                            <br/><br/><br/>
+                                            <apex:outputPanel rendered="{!isSharedDexcom}">
+                                                <svg aria-hidden="true" class="slds-icon slds-icon--large slds-icon-standard-user">
+                                                    <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/standard-sprite/svg/symbols.svg#link')}"></use>
+                                                </svg>
+                                            </apex:outputPanel>
+                                        </div>
+                                        <div class="slds-media__body">
+                                            <p class="slds-text-heading--label">Patient</p>
+                                            <p class="slds-text-heading--medium">{!myOpportunityDetails.Account.Name}</p>
+                                        
+                                        <br/><br/><br/>
+                                            <apex:outputPanel rendered="{!isSharedDexcom}">
+                                            <p class="slds-text-heading--label" style="color:green  ;">Shared with Dexcom</p>
+                                            </apex:outputPanel>
+                                        </div>
+                                    </div>
+                                    <!-- / MEDIA OBJECT -->
+                                    <!-- HEADING AREA -->
+                                </div>
+                                <c:statusMessages />
+                                <apex:pageBlock >
+                                    <apex:pageBlockButtons >
+                                       <!-- <apex:commandButton action="{!save}" styleClass="slds-button slds-button--neutral" id="saveOpportunityDetails" value="Save"/>-->
+                                        <button type="button" class="slds-button slds-button--neutral " title="Save" onclick="openModelPopup(); return false;">Save</button>
+                                    </apex:pageBlockButtons>
+                                    <div class="slds-col slds-size--2-of-10">
+                                        <apex:outputPanel id="oppDetails" >
+                                            <table class="slds-table">
+                                                <tr>
+                                                    <th class="slds-size--1-of-4 slds-text-heading--label slds-text-align_right">Opportunity Name</th>
+                                                    <td class="slds-size--1-of-4 slds-text-body--regular">{!myOpportunityDetails.Name}</td>
+                                                    <th class="slds-size--1-of-4 slds-text-heading--label slds-text-align_right">Date Needed</th>
+                                                    <td class="slds-size--1-of-4">
+                                                        <apex:outputText value="{0,date,MM/dd/yyyy }">
+                                                            <apex:param value="{!myOpportunityDetails.CloseDate}" />
+
+                                                        </apex:outputText>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="slds-size--1-of-4 slds-text-heading--label slds-text-align_right">Opportunity Owner</th>
+                                                    <td class="slds-size--1-of-4 slds-text-body--regular"><apex:inputField id="ownerLookup" value="{!Opportunity.OwnerId}" style="width:200px;" /></td>
+                                                    <th class="slds-size--1-of-4 slds-text-heading--label slds-text-align_right">Amount</th>
+                                                    <td class="slds-size--1-of-4 slds-text-body--regular">${!opportunityAmount}</td>
+                                                </tr>
+                                                <tr >
+                                                    <th class="slds-size--1-of-4 slds-text-heading--label slds-text-align_right">Urgent</th>
+                                                    <td class="slds-size--1-of-4 slds-text-body--regular"><apex:inputCheckbox styleClass="urgentSC" id="urgent" value="{!Opportunity.Urgent__c}" /></td>
+                                                    <th class="slds-size--1-of-4 slds-text-heading--label slds-text-align_right">Bright Tree Patient Id</th>
+                                                    <td class="slds-size--1-of-4 slds-text-body--regular">{!Opportunity.BrightTree_Patient_Id__c}</td>
+                                                </tr>
+                                                <tr class="URclass">
+                                                    <th class="slds-text-heading--label slds-text-align_right">Urgent Reason</th>
+                                                    <td class="slds-text-body--regular"><apex:inputField id="urgentReason" value="{!Opportunity.Urgent_Reason__c}" style="width:150px" /></td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="slds-size--1-of-4 slds-text-heading--label slds-text-align_right">Stage</th>
+                                                    <td class="slds-size--1-of-4 slds-text-body--regular"><apex:inputField value="{!Opportunity.StageName}" style="width:150px"/></td>
+                                                    <th class="slds-size--1-of-4 slds-text-heading--label slds-text-align_right">Status</th>
+                                                    <td class="slds-size--1-of-4 slds-text-body--regular"><apex:inputField value="{!Opportunity.Status__c}" style="width:150px"/></td>
+                                                </tr>
+                                                <tr>
+                                                    <th class="slds-size--1-of-4 slds-text-heading--label slds-text-align_right">Classification</th>
+                                                    <td class="slds-size--1-of-4 slds-text-body--regular"><apex:outputLabel value="{!Opportunity.Classification__c}" style="width:150px"/></td>
+                                                    <th class="slds-size--1-of-4 slds-text-heading--label slds-text-align_right"></th>
+                                                    <td class="slds-size--1-of-4 slds-text-body--regular"> </td>
+                                                </tr>                                               
+                                                
+                                            </table>
+                                        </apex:outputPanel>
+                                    </div>
+                                </apex:pageBlock>
+
+                                <!-- / PAGE HEADER / ROW 1 / COLUMN 1 -->
+                                <!-- PAGE HEADER / ROW 1 / COLUMN 2 -->
+                                <div class="slds-button-group slds-size--2-of-10" role="group" style="margin-left:20px;" >
+                                     <!--<button class="slds-button slds-button--neutral compact-button" style="height:70px;" onClick="openModal(); return false;"> -->
+                                        <!--<apex:commandLink value="Project Info" id="projectDetailsButton" onclick="return false;"/>-->
+                                        <!-- <apex:commandLink value="Patient Details" onclick="return false;"/> -->
+                                        
+                                        <!--Project Info-->
+                                    <!-- </button> -->
+                                <!-- #158712136 open OOB Account standard page layout in new primary tab instead -->
+                                    <!--<c:patientsModal patientAccount="{!myOpportunityDetails.Account}"> </c:patientsModal>-->
+                                    <button id="patientDetailsNewTab" class="slds-button slds-button--neutral compact-button" style="height:70px;" title="Patient Details" >Patient Details</button>
+
+                                    <c:addProductModal patientAccount="{!myOpportunityDetails.Account}" currentOpp="{!myOpportunityDetails}"> </c:addProductModal>
+                                    <c:addProviderModal patientAccount="{!myOpportunityDetails.Account}"> </c:addProviderModal>
+                                    <c:addInsurancePayor patientAccount="{!myOpportunityDetails.Account}"> </c:addInsurancePayor>
+                                    <c:CreateSalesOrder patientAccount="{!myOpportunityDetails.Account}" currentOpp="{!myOpportunityDetails}"> </c:CreateSalesOrder>
+                                    <c:DexcomFieldsModal patientAccount="{!myOpportunityDetails.Account}" currentOpp="{!myOpportunityDetails}" rendered="{!isDexOpp}"> </c:DexcomFieldsModal>
+
+
+                                    <!--New Appt (Field)-->
+                                </div>
+                               
+                            </div>
+                            <!--
+                            <button type="button" class="slds-button slds-button--neutral " style="float: right;margin-top: -5%;" title="Create DocSet" onclick="openModelPopup1(); ">Create DocSet</button>
+                             -->
+                            <!-- / PAGE HEADER TOP ROW -->
+                            <!-- / PAGE HEADER DETAIL ROW -->
+                        </div>
+                        
+                        
+                        <!-- / PAGE HEADER -->
+                        <!-- PRIMARY CONTENT WRAPPER -->
+                        <div class="slds">
+                            <!-- RELATED LIST CARDS-->
+                            <br />
+                            <div class="slds-grid slds-m-top--large">
+                                <div class="slds-col slds-col-rule--right slds-p-right--large slds-size--8-of-12">
+                                    <div class="slds-card">
+                                        <!--clay whitespace end-->
+                                        <!-- / CARD BODY = SECTION + TABLE -->
+                                        <header class="slds-card__header slds-grid">
+                                            <div class="slds-col slds-media slds-media--center">
+                                                <div class="slds-media__figure">
+                                                    <svg aria-hidden="true" class="slds-icon slds-icon-standard-contact slds-icon--small">
+                                                        <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/standard-sprite/svg/symbols.svg#contact')}"></use>
+                                                    </svg>
+                                                </div>
+                                                <div class="slds-media__body">
+                                                    <h3 class="slds-text-heading--small">DocSet Request</h3>
+                                                </div>
+                                            </div>
+                                        </header>
+                                        <!-- CARD BODY = TABLE -->
+                                        <apex:outputPanel id="docTypeReq">
+                                        <section class="slds-card__body">
+                                            <div class="slds-scrollable--x">
+                                                    <table class="slds-table slds-table--bordered slds-max-medium-table--stacked-horizontal">
+                                                        <thead>
+                                                            <tr class="slds-no-hover">
+                                                                <th class="slds-text-heading--label slds-size--1-of-7" scope="col"><b>Requested Date</b></th>
+                                                                <th class="slds-text-heading--label slds-size--1-of-7" scope="col"><b>RequestedByUserName</b></th>
+                                                                <th class="slds-text-heading--label slds-size--1-of-7" scope="col"><b>Notes</b></th>
+                                                                <th class="slds-row-action" scope="col">
+                                                                <!--<button class="slds-button slds-button&#45;&#45;icon-border-filled slds-button&#45;&#45;icon-border-small">-->
+                                                                  <!--<svg aria-hidden="true" class="slds-button__icon slds-button__icon&#45;&#45;hint slds-button__icon&#45;&#45;small">-->
+                                                                    <!--<use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/utility-sprite/svg/symbols.svg#down')}"></use>-->
+                                                                  <!--</svg>-->
+                                                                  <!--<span class="slds-assistive-text">Show More</span>-->
+                                                                <!--</button>-->
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                                <apex:repeat value="{!solaramedicalsupList}" var="solaramedicalsup" rows="9999">
+
+                                                                <tr>
+                                                                    <td data-label="Patient Responsibility">
+                                                                        <div class="slds-truncate" title="Patient Responsibility">
+                                                                            <apex:outputText value="{0,date,MM/dd/yyyy HH:mm a}"> 
+                                                                                <apex:param value="{!solaramedicalsup.RequestedDate}" /> 
+                                                                            </apex:outputText> 
+                                                                        </div>
+                                                                    </td>
+                                                                    <td data-label="Patient Responsibility">
+                                                                        <div class="slds-truncate" title="Patient Responsibility">{!solaramedicalsup.RequestedByUserName}</div>
+                                                                    </td>
+                                                                    <td data-label="Patient Responsibility">
+                                                                        <div class="slds-truncate" title="Patient Responsibility">{!solaramedicalsup.Notes}</div>
+                                                                    </td>
+                                                                    
+                                                                </tr>
+                                                                 </apex:repeat>
+
+                                                        </tbody>
+                                                    </table>
+                                            </div>
+                                        </section>
+                                        </apex:outputPanel>
+                                        <!-- / CARD BODY = SECTION + TABLE -->
+                                        <footer class="slds-card__footer">
+                                        </footer>
+                                    </div>
+                                </div>
+                                <!-- / MAIN CARD -->
+                                <br />
+                            </div>
+                            <!-- / RELATED LIST CARDS -->
+                        </div>
+                        <br />
+                        
+                        <!-- / PAGE HEADER -->
+                        <!-- PRIMARY CONTENT WRAPPER -->
+                        <div class="slds">
+                            <!-- RELATED LIST CARDS-->
+                            <br />
+                            <div class="slds-grid slds-m-top--large">
+                                <div class="slds-col slds-col-rule--right slds-p-right--large slds-size--8-of-12">
+                                    <div class="slds-card">
+                                        <!--clay whitespace end-->
+                                        <!-- / CARD BODY = SECTION + TABLE -->
+                                        <header class="slds-card__header slds-grid">
+                                            <div class="slds-col slds-media slds-media--center">
+                                                <div class="slds-media__figure">
+                                                    <svg aria-hidden="true" class="slds-icon slds-icon-standard-contact slds-icon--small">
+                                                        <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/standard-sprite/svg/symbols.svg#contact')}"></use>
+                                                    </svg>
+                                                </div>
+                                                <div class="slds-media__body">
+                                                    <h3 class="slds-text-heading--small">Products</h3>
+                                                </div>
+                                            </div>
+                                        </header>
+                                        <!-- CARD BODY = TABLE -->
+                                        <section class="slds-card__body">
+                                            <div class="slds-scrollable--x">
+                                                <apex:outputPanel id="searchResults">
+                                                    <table class="slds-table slds-table--bordered slds-max-medium-table--stacked-horizontal">
+                                                        <thead>
+                                                            <tr class="slds-no-hover">
+                                                                <th class="slds-text-heading--label slds-size--1-of-7" scope="col"><b>Product</b></th>
+                                                                <th class="slds-text-heading--label slds-size--1-of-7" scope="col"><b>Quantity</b></th>
+                                                                <th class="slds-text-heading--label slds-size--1-of-7" scope="col"><b>Allowed Amount</b></th>
+                                                                <th class="slds-text-heading--label slds-size--1-of-7" scope="col"><b>Patient Responsibility</b></th>
+                                                                <th class="slds-text-heading--label slds-size--1-of-7" scope="col"><b>Rx</b></th>
+                                                                <th class="slds-text-heading--label slds-size--1-of-7" scope="col"><b>Doc X</b></th>
+                                                                <th class="slds-text-heading--label slds-size--1-of-7" scope="col"><b>Doc Y</b></th>
+                                                                <th class="slds-row-action" scope="col">
+                                                                <!--<button class="slds-button slds-button&#45;&#45;icon-border-filled slds-button&#45;&#45;icon-border-small">-->
+                                                                  <!--<svg aria-hidden="true" class="slds-button__icon slds-button__icon&#45;&#45;hint slds-button__icon&#45;&#45;small">-->
+                                                                    <!--<use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/utility-sprite/svg/symbols.svg#down')}"></use>-->
+                                                                  <!--</svg>-->
+                                                                  <!--<span class="slds-assistive-text">Show More</span>-->
+                                                                <!--</button>-->
+                                                                </th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                        
+                                                            <apex:repeat value="{!opportunityProductList}" var="opportunityProduct">
+                                                                <tr>
+                                                                    <th scope="row" data-label="Product">
+                                                                        <div class="slds-truncate" title="Product"><a onClick="openCaseSubtab('/{!opportunityProduct.Id}')" href="javascript:;">{!opportunityProduct.Name}</a></div>
+                                                                    </th>
+                                                                    <td data-label="Quantity">
+                                                                        <div class="slds-truncate" title="Quantity">{!opportunityProduct.Quantity}</div>
+                                                                    </td>
+                                                                    <td data-label="Allowed Amount">
+                                                                        <div class="slds-truncate" title="List Price">{!opportunityProduct.ListPrice}</div>
+                                                                    </td>
+                                                                    <td data-label="Patient Responsibility">
+                                                                        <div class="slds-truncate" title="Patient Responsibility">{!opportunityProduct.UnitPrice}</div>
+                                                                    </td>
+                                                                    <td data-label="Rx">
+                                                                        <div class="slds-truncate" title="Rx">{! IF(opportunityProduct.Rx_Status__c == NULL, '-', opportunityProduct.Rx_Status__c)}</div>
+                                                                    </td>
+                                                                    <td data-label="Doc X">
+                                                                        <div class="slds-truncate" title="Doc X">{! IF(opportunityProduct.DocX_Status__c == NULL, '-', opportunityProduct.DocX_Status__c)}</div>
+                                                                    </td>
+                                                                    <td data-label="Doc Y">
+                                                                        <div class="slds-truncate" title="Doc Y">{! IF(opportunityProduct.DocY_Status__c == NULL, '-', opportunityProduct.DocY_Status__c)}</div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <apex:commandLink value="Remove" action="{!removeFromShoppingCart}" reRender="searchResults, oppDetails" immediate="true">
+                                                                            <!-- this param is how we send an argument to the controller, so it knows which row we clicked 'remove' on -->
+                                                                            <apex:param value="{!opportunityProduct.Id}" assignTo="{!toUnselect}" name="toUnselect"/>
+                                                                        </apex:commandLink>
+                                                                    </td>
+                                                                </tr>
+                                                            </apex:repeat>
+                                            
+                                                        </tbody>
+                                                    </table>
+                                                </apex:outputPanel>
+                                            </div>
+                                        </section>
+                                        <!-- / CARD BODY = SECTION + TABLE -->
+                                        <footer class="slds-card__footer">
+                                        </footer>
+                                    </div>
+                                </div>
+                                <!-- / MAIN CARD -->
+                                <br />
+                            </div>
+                            <!-- / RELATED LIST CARDS -->
+                        </div>
+                        <br />
+                        <!-- POTENTIAL PRODUCTS GO HERE -->
+                        <!-- / CARD BODY = SECTION + TABLE -->
+                        <!--<br />-->
+
+                        <!-- Start of Open Opportunities Section -->
+                        <div class="slds-grid slds-m-top--large">
+                            <div class="slds-col slds-col-rule--right slds-p-right--large slds-size--8-of-12">
+                                <div class="slds-card">
+                                    <!-- / CARD BODY = SECTION + TABLE -->
+                                    <br/>
+                                    <header class="slds-card__header slds-grid">
+                                        <div class="slds-col slds-media slds-media--center">
+                                            <div class="slds-media__figure">
+                                                <svg aria-hidden="true" class="slds-icon slds-icon-standard-contact slds-icon--small">
+                                                    <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/standard-sprite/svg/symbols.svg#contact')}"></use>
+                                                </svg>
+                                            </div>
+                                            <div class="slds-media__body">
+                                                <h3 class="slds-text-heading--small">Open Opportunities</h3>
+                                            </div>
+                                        </div>
+                                    </header>
+                                    <!-- CARD BODY = TABLE -->
+                                    <section class="slds-card__body">
+                                        <div class="slds-scrollable--x">
+                                            <table class="slds-table slds-table--bordered slds-max-medium-table--stacked-horizontal">
+                                                <thead>
+                                                <tr class="slds-no-hover">
+                                                    <th class="slds-text-heading--label slds-size--1-of-6" scope="col"><b>Product</b></th>
+                                                    <th class="slds-text-heading--label slds-size--1-of-6" scope="col"><b>Quantity</b></th>
+                                                    <th class="slds-text-heading--label slds-size--1-of-6" scope="col"><b>Allowed Amount</b></th>
+                                                    <th class="slds-text-heading--label slds-size--1-of-6" scope="col"><b>Patient Responsibility</b></th>
+                                                    <th class="slds-text-heading--label slds-size--1-of-6" scope="col"><b>Documentation</b></th>
+                                                    <th class="slds-text-heading--label slds-size--1-of-6" scope="col"><b>Sales Rep</b></th>
+                                                    <th class="slds-row-action" scope="col">
+                                                        <!--                 <button class="slds-button slds-button--icon-border-filled slds-button--icon-border-small">
+                              <svg aria-hidden="true" class="slds-button__icon slds-button__icon--hint slds-button__icon--small">
+                                <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/utility-sprite/svg/symbols.svg#down')}"></use>
+                              </svg>
+                              <span class="slds-assistive-text">Show More</span>
+                            </button> -->
+                                                    </th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <apex:repeat value="{!openOpportunityList}" var="lineItem">
+                                                        <tr>
+                                                            <!--<th scope="row" data-label="Product">-->
+                                                                <!--<div class="slds-truncate" title="Product"><a onClick="openCaseSubtab('/{!lineItem.Id}')" href="javascript:;">{!lineItem.Name}</a></div>-->
+                                                            <!--</th>-->
+                                                            <th scope="row" data-label="Opportunity">
+                                                                <div class="slds-truncate" title="Opportunity"><a onClick="openPrimaryOpportunityTab('/{!lineItem.OpportunityId}')" href="javascript:;">{!lineItem.Name}</a></div>
+                                                            </th>
+                                                            <td data-label="Quantity">
+                                                                <div class="slds-truncate" title="Quantity">{!lineItem.Quantity}</div>
+                                                            </td>
+                                                            <td data-label="Allowed Amount">
+                                                                <div class="slds-truncate" title="List Price">{!lineItem.ListPrice}</div>
+                                                            </td>
+                                                            <td data-label="Patient Responsibility">
+                                                                <div class="slds-truncate" title="Patient Responsibility">{!lineItem.UnitPrice}</div>
+                                                            </td>
+                                                            <td data-label="Documentation">
+                                                                <div class="slds-truncate" title="Documentation">{! IF(lineItem.Documentation_Status__c == NULL, '-', lineItem.Documentation_Status__c)}</div>
+                                                            </td>
+                                                            <td data-label="Sales Rep">
+                                                                <div class="slds-truncate" title="Sales Rep">{!lineItem.Opportunity.Owner.Name}</div>
+                                                            </td>
+                                                        </tr>
+                                                    </apex:repeat>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </section>
+                                    <!-- / CARD BODY = SECTION + TABLE -->
+                                    <footer class="slds-card__footer">
+                                    </footer>
+                                </div>
+                            </div>
+                            <!-- / MAIN CARD -->
+                            <br />
+                            </div>
+                        </div>
+                        <!-- End of Open Opportunities Table -->
+
+                        <!-- Start of Opportunity Notes Table -->
+                        <div class="slds-grid slds-m-top--large">
+                            <div class="slds-col slds-col-rule--right slds-p-right--large slds-size--8-of-12">
+                                <div class="slds-card">
+                                    <!-- / CARD BODY = SECTION + TABLE -->
+                                    <br/>
+                                    <header class="slds-card__header slds-grid">
+                                        <div class="slds-col slds-media slds-media--center">
+                                            <div class="slds-media__figure">
+                                                <svg aria-hidden="true" class="slds-icon slds-icon-standard-contact slds-icon--small">
+                                                    <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/standard-sprite/svg/symbols.svg#contact')}"></use>
+                                                </svg>
+                                            </div>
+                                            <div class="slds-media__body">
+                                                <h3 class="slds-text-heading--small">Opportunity Notes</h3>
+                                            </div>
+                                        </div>
+                                    </header>
+                                    <!-- CARD BODY = TABLE -->
+                                    <section class="slds-card__body">
+                                        <div class="slds-scrollable--x">
+                                            <table class="slds-table slds-table--bordered slds-max-medium-table--stacked-horizontal">
+                                                <thead>
+                                                <tr class="slds-no-hover">
+                                                    <th class="slds-text-heading--label slds-size--1-of-5" scope="col"><b>Subject Line</b></th>
+                                                    <th class="slds-text-heading--label slds-size--1-of-5" scope="col"><b>Created Date</b></th>
+                                                    <th class="slds-text-heading--label slds-size--1-of-5" scope="col"><b>Call Disposition</b></th>
+                                                    <th class="slds-text-heading--label slds-size--1-of-5" scope="col"><b>Assigned To</b></th>
+                                                    <th class="slds-text-heading--label slds-size--1-of-5" scope="col"><b>Comments</b></th>
+                                                    <th class="slds-row-action" scope="col"></th>
+
+                                                        <!--                 <button class="slds-button slds-button--icon-border-filled slds-button--icon-border-small">
+                                  <svg aria-hidden="true" class="slds-button__icon slds-button__icon--hint slds-button__icon--small">
+                                    <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/utility-sprite/svg/symbols.svg#down')}"></use>
+                                  </svg>
+                                  <span class="slds-assistive-text">Show More</span>
+                                </button> -->
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                <apex:repeat value="{!opportunityNotes}" var="task">
+                                                    <tr>
+                                                        <td scope="row" data-label="Subject Line">
+                                                            <div class="slds-truncate" title="Product"><a onClick="openCaseSubtab('/{!task.Id}')" href="javascript:;">{!task.Subject}</a></div>
+                                                        </td>
+                                                        <td data-label="Created Date">
+                                                            <div class="slds-truncate" title="Quantity"><apex:outputField value="{!task.CreatedDate}"/></div>
+                                                        </td>
+                                                        <td data-label="Call Disposition">
+                                                            <div class="slds-truncate" title="Patient Responsibility">{!task.Call_Disposition__c}</div>
+                                                        </td>
+                                                        <td data-label="Assigned To">
+                                                            <div class="slds-truncate" title="Documentation">{!task.Owner.Name}</div>
+                                                        </td>
+                                                        <td data-label="Comments">
+                                                            <div class="slds-truncate" title="Sales Rep">{!LEFT(task.Description,50)}</div>
+                                                        </td>
+                                                    </tr>
+                                                </apex:repeat>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </section>
+                                    <!-- / CARD BODY = SECTION + TABLE -->
+                                    <footer class="slds-card__footer">
+                                    </footer>
+                                </div>
+                            </div>
+                            <!-- / MAIN CARD -->
+                            <br />
+                        </div>
+                    <!--End of Opportunity Notes Table-->
+
+
+
+
+                </apex:form>
+            </div>
+            <div id="tab-scoped-2" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="tab-scoped-2__item">
+                <!--<apex:form >--> <!--These apex tags should be in here if we have action button on the top of the page-->
+                    <div class="slds">
+                        <div class="slds-page-header" role="banner">
+
+                            <!-- PAGE HEADER TOP ROW -->
+                            <div class="slds-grid">
+
+                                <!-- PAGE HEADER / ROW 1 / COLUMN 1 -->
+                                <div class="slds-col slds-size--2-of-12">
+
+                                    <!-- HEADING AREA -->
+                                    <!-- MEDIA OBJECT = FIGURE + BODY -->
+                                    <div class="slds-media">
+
+                                        <div class="slds-media__figure">
+                                            <svg aria-hidden="true" class="slds-icon slds-icon--large slds-icon-standard-user">
+                                                <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/standard-sprite/svg/symbols.svg#user')}"></use>
+                                            </svg>
+                                        </div>
+
+                                        <div class="slds-media__body">
+                                            <p class="slds-text-heading--label">Patient</p>
+                                            <h2 class="slds-text-heading--medium">{!myOpportunityDetails.Account.Name}</h2>
+                                        </div>
+                                    </div>
+                                    <!-- / MEDIA OBJECT -->
+                                    <!-- HEADING AREA -->
+                                </div>
+                                <!-- / PAGE HEADER / ROW 1 / COLUMN 1 -->
+
+
+                            </div>
+                            <!-- / PAGE HEADER TOP ROW -->
+                            <!-- / PAGE HEADER DETAIL ROW -->
+                            <!-- / PAGE HEADER DETAIL ROW -->
+
+                        </div>
+                    </div>
+                <!--</apex:form>-->
+
+
+                <div class="slds">
+                    <div class="slds-grid slds-m-top--large">
+                        <div class="slds-col slds-col-rule--right slds-p-right--large slds-size--8-of-12">
+                            <div class="slds-card">
+                                <header class="slds-card__header slds-grid">
+                                    <div class="slds-col slds-media slds-media--center">
+                                        <div class="slds-media__figure">
+                                            <svg aria-hidden="true" class="slds-icon slds-icon-standard-contact slds-icon--small">
+                                                <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/standard-sprite/svg/symbols.svg#record')}"></use>
+                                            </svg>
+                                        </div>
+                                        <div class="slds-media__body">
+                                            <h3 class="slds-text-heading--small">History</h3>
+                                        </div>
+                                    </div>
+                                </header>
+                               <section class="slds-card__body">
+                                        <div class="slds-scrollable--x">
+                                            <table class="slds-table slds-table--bordered slds-max-medium-table--stacked-horizontal">
+                                                <thead>
+                                                <tr class="slds-no-hover">
+                                                    <th class="slds-text-heading--label slds-size--1-of-7" scope="col"><b>Product</b></th>
+                                                    <th class="slds-text-heading--label slds-size--1-of-7" scope="col"><b>Quantity</b></th>
+                                                    <th class="slds-text-heading--label slds-size--1-of-7" scope="col"><b>Allowed Amount</b></th>
+                                                    <th class="slds-text-heading--label slds-size--1-of-7" scope="col"><b>Patient Responsibility</b></th>
+                                                    <th class="slds-text-heading--label slds-size--1-of-7" scope="col"><b>Documentation</b></th>
+                                                    <th class="slds-text-heading--label slds-size--1-of-7" scope="col"><b>Sales Rep</b></th>
+                                                    <th class="slds-text-heading--label slds-size--1-of-7" scope="col"><b>Close Date</b></th>
+                                                    <th class="slds-row-action" scope="col">
+                                                    <!--<button class="slds-button slds-button--icon-border-filled slds-button--icon-border-small">
+                                                          <svg aria-hidden="true" class="slds-button__icon slds-button__icon--hint slds-button__icon--small">
+                                                            <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/utility-sprite/svg/symbols.svg#down')}"></use>
+                                                          </svg>
+                                                          <span class="slds-assistive-text">Show More</span>
+                                                        </button> -->
+                                                    </th>
+                                                </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <apex:repeat value="{!salesHistoryList}" var="historyItem">
+                                                        <tr>
+                                                            <th scope="row" data-label="Product">
+                                                                <div class="slds-truncate" title="Product"><a onClick="openCaseSubtab('/{!historyItem.Id}')" href="javascript:;">{!historyItem.Name}</a></div>
+                                                            </th>
+                                                            <td data-label="Quantity">
+                                                                <div class="slds-truncate" title="Quantity">{!historyItem.Quantity}</div>
+                                                            </td>
+                                                            <td data-label="Allowed Amount">
+                                                                <div class="slds-truncate" title="List Price">{!historyItem.ListPrice}</div>
+                                                            </td>
+                                                            <td data-label="Patient Responsibility">
+                                                                <div class="slds-truncate" title="Patient Responsibility">{!historyItem.UnitPrice}</div>
+                                                            </td>
+                                                            <td data-label="Documentation">
+                                                                <div class="slds-truncate" title="Documentation">{! IF(historyItem.Documentation_Status__c == NULL, '-', historyItem.Documentation_Status__c) }</div>
+                                                            </td>
+                                                            <td data-label="Sales Rep">
+                                                                <div class="slds-truncate" title="Sales Rep">{!historyItem.Opportunity.Owner.Name}</div>
+                                                            </td>
+                                                            <td data-label="Sales Rep">
+                                                                <div class="slds-truncate" title="Close Date">
+                                                                    <apex:outputText value="{0,date,MM/dd/yyy}">
+                                                                        <apex:param value="{!historyItem.Opportunity.CloseDate}" />
+                                                                    </apex:outputText>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </apex:repeat>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </section>
+                                    <!-- / CARD BODY = SEC-->
+
+                            </div>
+                        </div>
+                    </div>
+                    <br />
+                    <br />
+                </div>
+
+
+            </div>
+            
+            
+            <div id="tab-scoped-3" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="tab-scoped-3__item">
+                <!--<apex:form >--> <!--These apex tags should be in here if we have action button on the top of the page-->
+                <div class="slds">
+                    <div class="slds-page-header" role="banner">
+
+                        <!-- PAGE HEADER TOP ROW -->
+                        <div class="slds-grid">
+
+                            <!-- PAGE HEADER / ROW 1 / COLUMN 1 -->
+                            <div class="slds-col slds-size--2-of-12">
+
+                                <!-- HEADING AREA -->
+                                <!-- MEDIA OBJECT = FIGURE + BODY -->
+                                <div class="slds-media">
+
+                                    <div class="slds-media__figure">
+                                        <svg aria-hidden="true" class="slds-icon slds-icon--large slds-icon-standard-user">
+                                            <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/standard-sprite/svg/symbols.svg#user')}"></use>
+                                        </svg>
+                                    </div>
+
+                                    <div class="slds-media__body">
+                                        <p class="slds-text-heading--label">Patient</p>
+                                        <h2 class="slds-text-heading--medium">{!myOpportunityDetails.Account.Name}</h2>
+                                    </div>
+                                </div>
+                                <!-- / MEDIA OBJECT -->
+                                <!-- HEADING AREA -->
+                            </div>
+                            <!-- / PAGE HEADER / ROW 1 / COLUMN 1 -->
+
+                         
+
+                        </div>
+                        <!-- / PAGE HEADER TOP ROW -->
+                        <!-- / PAGE HEADER DETAIL ROW -->
+                        <!-- / PAGE HEADER DETAIL ROW -->
+
+                    </div>
+          
+                    <div class="slds-grid slds-m-top--large">
+                        <div class="slds-col slds-col-rule--right slds-p-right--large slds-size--8-of-12">
+
+                       
+  
+
+
+                        </div>
+                    </div>
+                    <br />
+                    <br />
+                </div>
+                <!--</apex:form>-->
+            </div>
+
+        </div>
+    </div>
+
+      <script type="text/javascript">
+
+        var j$ = jQuery.noConflict();
+        showUrgentReason();
+
+        function showUrgentReason() {
+            var urgentVal = j$('.urgentSC').is(':checked');
+            console.log('It changed: ' + urgentVal);
+
+            if (urgentVal == true){
+                console.log('display urgent reason');
+                j$('.URclass').show();
+            } else {
+                console.log('do not display urgent reason');
+                j$('.URclass').hide();
+            }
+        }
+
+        j$('.urgentSC').change(function(){
+            showUrgentReason();
+        });
+        
+        
+        
+        var modelPopup = document.getElementById("modelPopup");
+        var backgroundFad = document.getElementById("backgroundFad");
+        var modelPopup1 = document.getElementById("modelPopup1");
+        
+        
+        function openModelPopup1(){
+            modelPopup1.classList.remove("slds-fade-in-close");
+            backgroundFad.classList.remove("slds-backdrop_close");
+            
+            modelPopup1.classList.add("slds-fade-in-open");
+            backgroundFad.classList.add("slds-backdrop_open");
+        }
+        
+        function closeModelPopup1(){
+            modelPopup1.classList.remove("slds-fade-in-open");
+            backgroundFad.classList.remove("slds-backdrop_open");
+            
+            modelPopup1.classList.add("slds-fade-in-close");
+            backgroundFad.classList.add("slds-backdrop_close");
+        }
+        
+        function openModelPopup(){
+            modelPopup.classList.remove("slds-fade-in-close");
+            backgroundFad.classList.remove("slds-backdrop_close");
+            
+            modelPopup.classList.add("slds-fade-in-open");
+            backgroundFad.classList.add("slds-backdrop_open");
+        }
+        
+        function closeModelPopup(){
+            modelPopup.classList.remove("slds-fade-in-open");
+            backgroundFad.classList.remove("slds-backdrop_open");
+            
+            modelPopup.classList.add("slds-fade-in-close");
+            backgroundFad.classList.add("slds-backdrop_close");
+        }
+        
+        j$(document).ready(function(){
+                j$("a[id*='ownerLookup']").html('');
+                j$("a[id*='ownerLookup']").html('&nbsp;<svg aria-hidden="true" onblur="this.className = \'lookupIcon\';" onfocus="this.className = \'lookupIconOn\';" onmouseout="this.className = \'lookupIcon\';this.className = \'lookupIcon\';" onmouseover="this.className = \'lookupIconOn\';this.className = \'lookupIconOn\';" class="slds-icon slds-icon-utility-search slds-icon--x-small slds-icon-text-default"><use xlink:href="{!URLFOR($Resource.SLDS232, "assets/icons/utility-sprite/svg/symbols.svg#search")}"></use></svg>');
+                applyTabFunctionality();
+                testSetTabTitle();
+
+                j$('#timeOutMessage').hide();
+                //Search for providers when the Search Providers button clicked
+                j$('#searchProvidersButton').click(function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    searchProviders();
+                });
+
+                j$('.slds-timeline__item_details').hide();
+                // j$('.slds-button').click(function(e) {
+
+                //     j$(this).closest('ul').find('> li.tree-parent').attr('aria-expanded', function (i, attr) {
+                //         return attr == 'true' ? 'false' : 'true'
+                //     });
+
+                // });
+
+                //Typing return in the input text box activates the search button
+                j$('#text-input-id-1tt').on('keyup', function(e) {
+                    console.log(e);
+                    if(e.which == 13){
+                        searchProviders();
+                        return null;
+                    } else {
+                        return null;
+                    }
+                });
+        
+                //debugger;
+                //alert('{!myOpportunityDetails.External_Id__c}');
+                if ('{!myOpportunityDetails.External_Id__c}' != null && '{!myOpportunityDetails.External_Id__c}' != '' ){
+                    refreshDocSetReq('{!myOpportunityDetails.External_Id__c}');
+                }
+        
+        
+        });
+
+          function openModal() {
+            var j$ = jQuery.noConflict();
+            var iframe_url = '{!URLFOR("/apex/Console_PatientContactModal")}';
+            var iframe_url = iframe_url.concat('&id={!Opportunity.Id}');
+            console.log(iframe_url);
+            var child_domain = iframe_url.substring(0, iframe_url.indexOf('/', 9));
+            //var parent_domain = window.location.protocol + '//' + window.location.host;
+            var j$modalDialog = j$('<div id="opppopup" style="overflow: hidden;"></div>')
+            .html('<iframe id="iframeContentId" src="' + iframe_url + '" frameborder="0" height="100%" width="100%" marginheight="0" marginwidth="0" scrolling="yes" />')
+            .dialog({
+                autoOpen: false,
+                title: 'Patients &amp; Contacts',
+                resizable: true,
+                width: 1200,
+                height: 800,
+                autoResize: true,
+                modal: true,
+                draggable: true
+            });
+
+            j$modalDialog.dialog('open');
+          }
+
+        function applyTabFunctionality() {
+            j$('li.slds-tabs--scoped__item').click(function() {
+                var currentTab = j$(this); //Active Tab
+                var otherTabs = j$("li.slds-tabs--scoped__item").not(this); //Inactive Tabs
+
+                var currentPageId = j$(this).find('a').attr('aria-controls');
+                var currentPage = j$('#'+currentPageId);
+                var otherPages = j$("div.slds-tabs--scoped__content").not(currentPage); //Inactive Pages
+
+                if(!currentTab.hasClass('slds-active')) { //This code runs when an inactive tab is clicked
+                    otherTabs.removeClass("slds-active");
+                    currentTab.addClass("slds-active");
+                    currentPage.toggleClass('slds-hide slds-show');
+                    otherPages.removeClass('slds-show').addClass('slds-hide');
+                }
+            });
+        }
+        function testSetTabTitle() {
+            //Set the current tab's title
+                sforce.console.setTabTitle('{!myOpportunityDetails.Account.Name}');
+        }
+        function openCaseSubtab(url) {
+            // Check if user is in the Console, otherwise open as a regular URL
+            if (sforce.console.isInConsole()) {
+                sforce.console.getEnclosingPrimaryTabId(function(result){
+                    sforce.console.openSubtab(result.id, url, true, '', null);
+                });
+            } else {
+                window.open(url);
+            }
+        }
+        function openPrimaryOpportunityTab(url) {
+            // Check if user is in the Console, otherwise open as a regular URL
+            if (sforce.console.isInConsole()) {
+                sforce.console.getEnclosingPrimaryTabId(function(result){
+                    console.log(url);
+                //    sforce.console.openPrimaryTab(result.id, url, true, '', null);
+                    sforce.console.openPrimaryTab(null, url, true, '', null);
+                });
+            } else {
+                window.open(url);
+            }
+        }
+
+
+        //#158712136 open OOB Account standard page layout in new primary tab instead
+        j$('#patientDetailsNewTab').click(function(e){
+           e.preventDefault();
+           openPrimaryOpportunityTab('{!myOpportunityDetails.Account}');
+        });
+      </script>
+      </apex:outputPanel>
+    </body>
+
+
+
+</html>
+</apex:page>

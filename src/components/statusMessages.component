@@ -1,0 +1,61 @@
+<!--
+ - Created by isaac on 3/19/18.
+ -->
+
+<apex:component id="statusMessages">
+    <!-- Success message -->
+    <div id="successMsgDiv" class="demo-only" style="height: 4rem; display:none;">
+        <div class="slds-notify_container slds-is-relative">
+            <div class="slds-notify slds-notify_toast slds-theme_success" role="alert">
+                <span class="slds-assistive-text">success</span>
+                <span class="slds-icon_container slds-icon-utility-success slds-m-right_small slds-no-flex slds-align-top" title="Description of icon when needed">
+                    <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                        <use xlink:href="{!URLFOR($Resource.SLDS232, '/assets/icons/utility-sprite/svg/symbols.svg#success')}" xmlns:xlink="http://www.w3.org/1999/xlink" />
+                    </svg>
+                </span>
+                <div class="slds-notify__content">
+                    <h2 id="successMsg" class="slds-text-heading_small"></h2>
+                </div>
+                <button id="closeSuccessMsgBtn" class="slds-button slds-button_icon slds-notify__close slds-button_icon-inverse" title="Close">
+                    <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                        <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/utility-sprite/svg/symbols.svg#close')}" xmlns:xlink="http://www.w3.org/1999/xlink" />
+                    </svg>
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <!-- Error Message Section-->
+    <div id="errorMsgDiv" class="slds-notify slds-notify_alert slds-theme_alert-texture slds-theme_error" role="alert" style="display:none;">
+        <span class="slds-assistive-text">error</span>
+        <span class="slds-icon_container slds-icon-utility-ban slds-m-right_x-small" title="Error">
+            <svg class="slds-icon slds-icon_x-small" aria-hidden="true">
+                <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/utility-sprite/svg/symbols.svg#ban')}" xmlns:xlink="http://www.w3.org/1999/xlink" />
+            </svg>
+        </span>
+        <!-- ERROR MESSAGE HERE -->
+        <h2 id="errorMsg"></h2>
+        <button id="closeErrorMsgBtn" class="slds-button slds-button_icon slds-notify__close slds-button_icon-inverse" title="Close">
+            <svg class="slds-button__icon" aria-hidden="true">
+                <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/utility-sprite/svg/symbols.svg#close')}" xmlns:xlink="http://www.w3.org/1999/xlink" />
+            </svg>
+            <span class="slds-assistive-text">Close</span>
+        </button>
+    </div>
+
+    <script>
+        j$ = jQuery.noConflict();
+
+        j$('#closeSuccessMsgBtn').click(function(e) {
+            e.preventDefault();
+            j$('#successMsgDiv').hide();
+            return false;
+        });
+
+        j$('#closeErrorMsgBtn').click(function(e) {
+            e.preventDefault();
+            j$('#errorMsgDiv').hide();
+            return false;
+        });
+    </script>
+</apex:component>

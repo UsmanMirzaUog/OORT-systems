@@ -1,0 +1,314 @@
+<!--
+ - Created by isaac on 4/25/18.
+ -->
+
+<apex:component id="ADMPatientDetailModal" controller="ADMPatientModalDetailModalController">
+
+
+
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <apex:includeScript value="/soap/ajax/26.0/connection.js"/>
+    <apex:includeScript value="/js/functions.js"/>
+    <apex:includeScript value="/support/console/36.0/integration.js"/>
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.css"/>
+    <!--<apex:stylesheet value="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css"/>-->
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/select/1.2.3/js/dataTables.select.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
+
+
+    <div class="slds-modal" aria-hidden="false" role="dialog" id="ptDetailModal" >
+        <div class="slds-modal__container" style="max-width:80em; width:100%">
+            <header class="slds-modal__header">
+                <button id="closePtDetailModal" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+                    <svg class="slds-button__icon slds-button__icon_large">
+                        <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/utility-sprite/svg/symbols.svg#close')}" />
+                    </svg>
+                    <span class="slds-assistive-text">Close</span>
+                </button>
+                <h2 class="slds-text-heading--medium slds-hyphenate">Patient Detail</h2>
+            </header>
+            <div class="slds-modal__content slds-p-around--large">
+                <div class="slds-form">
+                    <div class="slds-grid" style="margin:1em;">
+                        <div class="slds-size--3-of-3">
+                            <div class="slds-form-element" style="margin-top:1em;">
+                                <label class="slds-form-element__label" for="input-id-01"></label>
+                                <div class="slds-form-element__control">
+                                    <article class="slds-card">
+                                        <div class="slds-card__header slds-grid">
+                                            <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                                <div class="slds-media__figure">
+                                                            <span class="slds-icon_container slds-icon-standard-contact" title="description of icon when needed">
+                                                              <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/standard-sprite/svg/symbols.svg#contact')}" />
+                                                              </svg>
+                                                            </span>
+                                                </div>
+                                                <div class="slds-media__body">
+                                                    <h2><span class="slds-text-heading_medium" id="ptdetail-name"></span></h2>
+                                                </div>
+                                            </header>
+                                        </div>
+                                        <div class="slds-card__body slds-card__body_inner">
+                                            <div class="slds-grid slds-wrap">
+                                                <div class="slds-col slds-size--1-of-4 slds-m-top--medium slds-text-title_caps"><span>Date of Birth</span></div>
+                                                <div class="slds-col slds-size--1-of-4 slds-m-top--medium slds-text-title_caps"><span>Home Phone</span></div>
+                                                <div class="slds-col slds-size--1-of-4 slds-m-top--medium slds-text-title_caps"><span>Mobile Phone</span></div>
+                                                <div class="slds-col slds-size--1-of-4 slds-m-top--medium slds-text-title_caps"><span>Email</span></div>
+
+                                                <div class="slds-col slds-size--1-of-4"><span id="ptdetail-dob"></span></div>
+                                                <div class="slds-col slds-size--1-of-4"><span id="ptdetail-homephone"></span></div>
+                                                <div class="slds-col slds-size--1-of-4"><span id="ptdetail-mobilephone"></span></div>
+                                                <div class="slds-col slds-size--1-of-4"><span id="ptdetail-email"></span></div>
+
+                                                <div class="slds-col slds-size--1-of-4 slds-m-top--medium slds-text-title_caps"><span>Street</span></div>
+                                                <div class="slds-col slds-size--1-of-4 slds-m-top--medium slds-text-title_caps"><span>City</span></div>
+                                                <div class="slds-col slds-size--1-of-4 slds-m-top--medium slds-text-title_caps"><span>State</span></div>
+                                                <div class="slds-col slds-size--1-of-4 slds-m-top--medium slds-text-title_caps"><span>Zip Code</span></div>
+
+                                                <div class="slds-col slds-size--1-of-4"><span id="ptdetail-billingStreet"></span></div>
+                                                <div class="slds-col slds-size--1-of-4"><span id="ptdetail-billingCity"></span></div>
+                                                <div class="slds-col slds-size--1-of-4"><span id="ptdetail-billingState"></span></div>
+                                                <div class="slds-col slds-size--1-of-4"><span id="ptdetail-billingPostalCode"></span></div>
+
+                                                <div class="slds-col slds-size--1-of-4 slds-m-top--medium slds-text-title_caps"><span>Primary Insurer</span></div>
+                                                <div class="slds-col slds-size--1-of-4 slds-m-top--medium slds-text-title_caps"><span>Secondary Insurer</span></div>
+                                                <div class="slds-col slds-size--1-of-4 slds-m-top--medium slds-text-title_caps"></div>
+                                                <div class="slds-col slds-size--1-of-4 slds-m-top--medium slds-text-title_caps"></div>
+
+                                                <div class="slds-col slds-size--1-of-4"><span id="ptdetail-primaryInsurance"></span></div>
+                                                <div class="slds-col slds-size--1-of-4"><span id="ptdetail-secondaryInsurance"></span></div>
+                                                <div class="slds-col slds-size--1-of-4"></div>
+                                                <div class="slds-col slds-size--1-of-4"></div>
+                                            </div>
+                                        </div>
+                                    </article>
+
+
+                                <div id="NotesStreamDiv"  class="slds-grid slds-m-top--large slds-m-bottom--large">
+                                    <div class="slds-col slds-col-rule--right slds-p-right--large slds-p-left--large slds-size--1-of-1">
+                                        <div id="NotesStreamCard" class="slds-card">
+                                            <section id="NotesStreamSection" class="slds-card__body">
+                                                <div style="margin:1em;">
+                                                    <table id="NotesStreamTable" class="row-border stripe" width="95%"></table>
+                                                    <!-- Datatable goes here -->
+                                                </div>
+                                            </section>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="slds-grid" style="margin:1em;">
+                        <!--<apex:outputPanel id="NotesStreamComponent" rendered="{!notesRender}">-->
+                            <!--<c:NotesStream thePatientId="{!accountId}"  />-->
+                        <!--</apex:outputPanel>-->
+                    </div>
+                </div>
+            </div>
+            <div class="slds-modal__footer" />
+        </div>
+    </div>
+    </html>
+    <script>
+        j$ = jQuery.noConflict();
+        var table;
+        var tableExists = false;
+        var theAccountId;
+
+
+        //Display Modal
+        function displayPatientModal(ptId) {
+            console.log('ptId: ' + ptId);
+            ADMPatientModalDetailModalController.getPatient(ptId, function(result, err) {
+                if (result.Name != null) j$('#ptdetail-name').text(result.Name)
+                    else j$('#ptdetail-name').text(result.Name);
+                if (result.PersonHomePhone != null) j$('#ptdetail-homephone').text(result.PersonHomePhone)
+                    else j$('#ptdetail-homephone').text('–');
+                if (result.PersonMobilePhone != null) j$('#ptdetail-mobilephone').text(result.PersonMobilePhone)
+                    else j$('#ptdetail-mobilephone').text('–');
+                if (result.PersonEmail != null) j$('#ptdetail-email').text(result.PersonEmail)
+                    else j$('#ptdetail-email').text('–');
+                if (result.BillingStreet != null) j$('#ptdetail-billingStreet').text(result.BillingStreet)
+                    else j$('#ptdetail-billingStreet').text('–');
+                if (result.BillingCity != null) j$('#ptdetail-billingCity').text(result.BillingCity)
+                    else j$('#ptdetail-billingCity').text('–');
+                if (result.BillingState != null) j$('#ptdetail-billingState').text(result.BillingState)
+                    else j$('#ptdetail-billingState').text('–');
+                if (result.BillingPostalCode != null) j$('#ptdetail-billingPostalCode').text(result.BillingPostalCode)
+                    else j$('#ptdetail-billingPostalCode').text('–');
+                if (result.ShippingStreet != null) j$('#ptdetail-shippingStreet').text(result.ShippingStreet)
+                    else j$('#ptdetail-shippingStreet').text('–');
+                if (result.ShippingCity != null) j$('#ptdetail-shippingCity').text(result.ShippingCity)
+                    else j$('#ptdetail-shippingCity').text('–');
+                if (result.ShippingState != null) j$('#ptdetail-shippingState').text(result.ShippingState)
+                    else j$('#ptdetail-shippingState').text('–');
+                if (result.ShippingPostalCode != null) j$('#ptdetail-shippingPostalCode').text(result.ShippingPostalCode)
+                    else j$('#ptdetail-shippingPostalCode').text('–');
+                if (result.Date_of_Birth__c != null) {
+                    var convertedDate = new Date(result.Date_of_Birth__c);
+                    var timeZoneOffset = convertedDate.getTimezoneOffset() * 60000;
+                    var dob = new Date(result.Date_of_Birth__c + timeZoneOffset);
+                    j$('#ptdetail-dob').text(dob.toLocaleDateString());
+                } else if (result.PersonBirthdate != null) {
+                    var convertedDate = new Date(result.PersonBirthdate);
+                    var timeZoneOffset = convertedDate.getTimezoneOffset() * 60000;
+                    var dob = new Date(result.PersonBirthdate + timeZoneOffset);
+                    j$('#ptdetail-dob').text(dob.toLocaleDateString());
+                } else {
+                    j$('#ptdetail-dob').text('–');
+                }
+                if (result.Name != null) {
+                    j$('#backdrop').addClass('slds-backdrop--open');
+                    j$('#ptDetailModal').addClass('slds-fade-in-open');
+                }
+            });
+            ADMPatientModalDetailModalController.getPrimaryInsurance(ptId, function(result, err) {
+                console.log('getPrimaryInsurance result: ' + result);
+                if (result) j$('#ptdetail-primaryInsurance').text(result.Insurance__r.Name);
+                else j$('#ptdetail-primaryInsurance').text('–');
+            });
+            ADMPatientModalDetailModalController.getSecondaryInsurance(ptId, function(result, err) {
+                console.log('getSecondaryInsurance result: ' + result);
+                if (result) j$('#ptdetail-secondaryInsurance').text(result.Insurance__r.Name)
+                    else j$('#ptdetail-secondaryInsurance').text('–');
+            });
+//            ADMPatientModalDetailModalController.ADMPatientModalDetailModalController(ptId, function(result, err){
+//               console.log(result);
+//            });
+            theAccountId = ptId;
+            console.log('theAccountId: ' + theAccountId);
+            populateNotesStream(ptId);
+            console.log('end of displayPatientModal');
+        }
+
+        j$('#closePtDetailModal').click(function(e) {
+            e.preventDefault();
+            j$('#ptDetailModal').removeClass('slds-fade-in-open');
+            j$('#backdrop').removeClass('slds-backdrop--open');
+            j$('#ptdetail-name').text('');
+            j$('#ptdetail-homephone').text('');
+            j$('#ptdetail-mobilephone').text('');
+            j$('#ptdetail-email').text('');
+            j$('#ptdetail-billingStreet').text('');
+            j$('#ptdetail-billingCity').text('');
+            j$('#ptdetail-billingState').text('');
+            j$('#ptdetail-billingPostalCode').text('');
+            j$('#ptdetail-shippingStreet').text('');
+            j$('#ptdetail-shippingCity').text('');
+            j$('#ptdetail-shippingState').text('');
+            j$('#ptdetail-shippingPostalCode').text('');
+            j$('#ptdetail-dob').text('');
+        });
+
+
+
+
+
+
+
+
+
+        function openCaseSubtab(url) {
+             // Check if user is in the Console, otherwise open as a regular URL
+             console.log('open task tab');
+             if (sforce.console.isInConsole()) {
+                 console.log('console');
+                 sforce.console.getEnclosingPrimaryTabId(function(result){
+                     sforce.console.openSubtab(result.id, url, true, '', null);
+                 });
+             } else {
+                 console.log('window');
+                 window.open('/' + url);
+             }
+        }
+
+
+
+        function populateNotesStream(ptId) {
+            console.log ('Notes Stream');
+            ADMPatientModalDetailModalController.getNotesStream(
+                ptId,
+                parseNotesStreamResponse,
+                {escape: true}
+            );
+            return false;
+            console.log('population done');
+        }
+
+
+        /*-------------------------------------------------------*/
+        // Parses the search results from the remote action and
+        // generates the Notes Stream data table
+        /*-------------------------------------------------------*/
+        function parseNotesStreamResponse(result, event){
+            console.log('1');
+            if(event.status) {
+                console.log('2');
+                if(tableExists) {
+                    console.log('3');
+                    j$('#NotesStreamTable').DataTable().destroy();
+                    console.log('destroyed the table');
+                }
+                if(!isEmpty(result)){
+                    console.log('4');
+                    console.log('building table');
+//                    console.log('result in parseNoteStreamResponse: ' + result);
+                    table = j$('#NotesStreamTable').DataTable({
+                        data: result,
+                        columns: [
+                            {data: "type", defaultContent: "&mdash", title: "Record Type",
+                                render: function(data, display, result) {
+                                    if (data == 'ADM') return '<div class="slds-icon_container slds-icon-standard-task" title="task" ><svg class="slds-icon slds-icon_small" aria-hidden="true"><use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/custom-sprite/svg/symbols.svg#custom18')}" /></svg></div>';
+                                    else if (data == 'Call Log') return '<div class="slds-icon_container slds-icon-standard-task" title="task" ><svg class="slds-icon slds-icon_small" aria-hidden="true"><use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/custom-sprite/svg/symbols.svg#custom22')}" /></svg></div>';
+                                    else if (data == 'Opp Note') return '<div class="slds-icon_container slds-icon-standard-task" title="task" ><svg class="slds-icon slds-icon_small" aria-hidden="true"><use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/custom-sprite/svg/symbols.svg#custom83')}" /></svg></div>';
+                                    else if (data == 'PAR') return '<span><span class="slds-icon_container" title="task" ><svg class="slds-icon slds-icon_small" aria-hidden="true" style="background: rgb(220,203,100);" ><use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/custom-sprite/svg/symbols.svg#custom18')}" /></svg></span></span>';
+                                    else if (data == 'Patient Note') return '<div class="slds-icon_container slds-icon-standard-task" title="task" ><svg class="slds-icon slds-icon_small" aria-hidden="true"><use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/custom-sprite/svg/symbols.svg#custom83')}" /></svg></div>';
+                                }
+                            },
+                            {data: "subject", defaultContent: "&mdash", title: "Subject",
+                                render: function(data, display, result) {
+                                    return '<a href="#" id="openTask" onClick="openCaseSubtab(\''+result.taskId+'\');return false;">' + result.subject + '</a>';
+                                }
+                            },
+                            {data: "description", defaultContent: "&mdash;", title: "Description"},
+                            {data: "CreatedDateString", defaultContent: "&mdash;", title: "Created"}
+                        ],
+                        select: false,
+                        paging: false
+                    });
+                    tableExists = true;
+                    console.log ('table exists');
+//                    j$('#NotesStreamDiv').show();
+                }
+            } else if (event.type === 'exception') {
+                console.log('Exception happened');
+                console.log('EXCEPTION: ' + event.statuscode);
+                console.log(event);
+                    j$('#errorMessage').show();
+            } else {
+                console.log('NOTHING HAPPENED');
+            }
+        }
+
+
+
+        function isEmpty(obj) {
+            console.log('isEmpty()');
+            for(var key in obj) {
+                if(obj.hasOwnProperty(key))
+                    return false;
+            }
+            return true;
+        }
+    </script>
+</apex:component>

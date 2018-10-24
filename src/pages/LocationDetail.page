@@ -1,0 +1,865 @@
+<!--
+ - Created by danielpulache on 11/16/17.
+ -->
+
+<apex:page id="LocationDetail" standardController="Location__c" extensions="LocationDetailExt" docType="html-5.0">
+    <html xmlns="https://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <script src="{!URLFOR($Resource.aljs, '/jquery.aljs-all-with-moment.min.js')}"></script>
+    <apex:includeScript value="//code.jquery.com/jquery-2.1.1.min.js"/>
+    <apex:includeScript value="/soap/ajax/26.0/connection.js"/>
+    <apex:includeScript value="/js/functions.js"/>
+
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.css"/>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/select/1.2.3/js/dataTables.select.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
+
+    <head>
+        <title>Location Detail</title>
+        <apex:slds />
+    </head>
+
+    <body>
+    <apex:form >
+        <div class="slds-scope">
+            <div class="slds-tabs--scoped">
+                <ul class="slds-tabs--scoped__nav" role="tablist">
+                    <li class="slds-tabs--scoped__item slds-active" title="Location Detail" role="presentation"><a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" tabindex="0" aria-selected="true" aria-controls="tab-scoped-1" id="tab-scoped-1__item">Location Details</a></li>
+                    <li class="slds-tabs--scoped__item" title="Location Feed" role="presentation"><a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-2" id="tab-scoped-2__item">Tasks</a></li>
+                    <li class="slds-tabs--scoped__item" title="Patient Notes" role="presentation"><a class="slds-tabs--scoped__link" href="javascript:void(0);" role="tab" tabindex="-1" aria-selected="false" aria-controls="tab-scoped-3" id="tab-scoped-3__item">Log a Call</a></li>
+                </ul>
+                <div id="tab-scoped-1" class="slds-tabs--scoped__content slds-show" role="tabpanel" aria-labelledby="tab-scoped-1__item">
+                    <!-- PRIMARY CONTENT WRAPPER -->
+                    <div class="slds">
+                        <!-- RELATED LIST CARDS-->
+                        <div class="slds-grid slds-m-top--medium">
+                            <div class="slds-col slds-col-rule--right slds-p-right--large slds-p-left--large slds-size--8-of-12">
+                                <div class="slds-card">
+                                    <!--clay whitespace end-->
+                                    <!-- / CARD BODY = SECTION + TABLE -->
+                                    <div class="slds-card__body" id="SectionDetail">
+                                        <header class="slds-card__header slds-grid">
+                                            <div class="slds-media__figure" >
+                                                <svg aria-hidden="true" class="slds-icon slds-icon--large slds-icon-standard-user">
+                                                    <use xlink:href="{!URLFOR($Resource.SLDS232)}/assets/icons/standard-sprite/svg/symbols.svg#contract_line_item"></use>
+                                                </svg>
+                                            </div>
+                                            <div class="slds-col slds-media slds-media--center">
+                                                <div class="slds-media__body">
+                                            <h3 class="slds-text-heading--medium">MGTS: {!theLocationDetails.Location_Name__c}</h3>
+                                                </div>
+                                            </div>
+                                            <div class="slds-form-element slds-media--center" style="margin:1em; padding-left:250px">
+                                                <apex:commandButton action="{!saveTheRecord}" value="Save" styleClass="slds-button slds-button--neutral compact-button"/>
+                                            </div>
+
+                                        </header>
+                                        <div class="slds-grid slds-border_top" style="margin:1em;">
+                                            <div class="slds-size--1-of-4">
+                                                <div class="slds-form-element" style="margin-top:1em;">
+                                                    <label class="slds-form-element__label" for="input-id-01">Priority</label>
+                                                    <div class="slds-form-element__control">
+                                                        <apex:inputField type="text" value="{!theLocationDetails.Priority__c}" id="input-id-01" styleClass="slds-input" onClick="return false;"/>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element" style="margin-top:1em;">
+                                                    <label class="slds-form-element__label" for="input-id-02">$ of Medical Group Task Set</label>
+                                                    <div class="slds-form-element__control">
+                                                        <apex:outputField value="{!theLocationDetails.of_Medical_Group_Task_Set__c}" id="input-id-02" styleClass="slds-input"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-size--1-of-4">
+                                                <div class="slds-form-element" style="margin-top:1em;">
+                                                    <label class="slds-form-element__label" for="input-id-03">Provider Rules Score</label>
+                                                    <div class="slds-form-element__control">
+                                                        <apex:inputField type="text" value="{!theLocationDetails.Provider_Rules_Score__c}" id="input-id-03" styleClass="slds-input"/>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element" style="margin-top:1em;">
+                                                    <label class="slds-form-element__label" for="input-id-04">Num of Patients</label>
+                                                    <div class="slds-form-element__control">
+                                                        <apex:outputField value="{!theLocationDetails.Num_of_Patients__c}" id="input-id-04" styleClass="slds-input"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-size--1-of-4">
+                                                <div class="slds-form-element" style="margin-top:1em;">
+                                                    <label class="slds-form-element__label" for="input-id-05">Phone</label>
+                                                  <div class="slds-form-element__control">
+                                                        <apex:inputField type="text" value="{!theLocationDetails.Phone__c}" id="input-id-05" styleClass="slds-input"/>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element" style="margin-top:1em;">
+                                                    <label class="slds-form-element__label" for="input-id-06">Fax</label>
+                                                    <div class="slds-form-element__control">
+                                                        <apex:inputField type="text" value="{!theLocationDetails.Fax__c}" id="input-id-06" styleClass="slds-input" onClick="return false;"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="slds-size--1-of-4">
+                                                <div class="slds-form-element" style="margin-top:1em;">
+                                                    <label class="slds-form-element__label" for="input-id-05">Assigned Outside Sales Rep</label>
+                                                    <div class="slds-form-element__control">
+                                                        <apex:inputField value="{!theLocationDetails.Outside_Sales_Rep__c}" id="input-id-051"/>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element" style="margin-top:1em;">
+                                                    <label class="slds-form-element__label" for="input-id-052">Last Contacted</label>
+                                                    <div class="slds-form-element__control">
+                                                        <apex:outputField value="{!theLocationDetails.Last_Patient_Contact_Date__c}" id="input-id-052" styleClass="slds-input"/>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <br/>
+                                    </div>
+                                    <div class="slds-card__body slds-border_top">
+                                        <header class="slds-card__header slds-grid">
+                                            <div class="slds-media__body" >
+                                                <h2 class="slds-text-heading--medium">Address</h2>
+                                            </div>
+                                        </header>
+                                        <div class="slds-grid" style="margin:1em;">
+                                            <div class="slds-size--3-of-7">
+                                                <div class="slds-form-element" style="margin-top:1em;">
+                                                    <div class="slds-grid">
+                                                        <label class="slds-form-element__label" for="input-id-07" >Address 1&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                                        <span class="slds-form-element__control slds-size--3-of-4">
+                                                            <apex:inputField type="text" value="{!theLocationDetails.Address_Line_1__c}" id="input-id-07" styleClass="slds-input"/>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element" style="margin-top:1em;">
+                                                    <div class="slds-grid">
+                                                        <label class="slds-form-element__label" for="input-id-08">Address 2&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                                                        <span class="slds-form-element__control slds-size--3-of-4">
+                                                            <apex:inputField type="text" value="{!theLocationDetails.Address_Line_2__c}" id="input-id-08" styleClass="slds-input"/>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div class="slds-form-element" style="margin-top:1em;">
+                                                    <div class="slds-grid">
+                                                        <label class="slds-form-element__label" for="input-id-09">City, State, Zip</label>
+                                                        <span class="slds-form-element__control slds-size--3-of-4">
+                                                            <apex:inputField type="text" value="{!theLocationDetails.City__c}" styleClass="slds-input slds-size--4-of-7"/>
+                                                            <apex:inputField type="text" value="{!theLocationDetails.State__c}" styleClass="slds-input slds-size--1-of-7"/>
+                                                            <apex:inputField type="text" value="{!theLocationDetails.Zip_Code__c}" styleClass="slds-input slds-size--2-of-7"/>
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- / MAIN CARD -->
+                            <br />
+                        </div>
+                        <!-- / RELATED LIST CARDS -->
+                    </div>
+
+
+                    <div class="slds">
+                        <!-- RELATED LIST CARDS-->
+                        <div class="slds-grid slds-m-top--large">
+                            <div class="slds-col slds-col-rule--right slds-p-right--large slds-p-left--large slds-size--8-of-12">
+                                <div class="slds-card">
+                                    <!--clay whitespace end-->
+                                    <!-- / CARD BODY = SECTION + TABLE -->
+                                    <header class="slds-card__header slds-grid">
+                                        <div class="slds-col slds-media slds-media--center">
+                                            <div class="slds-media__body">
+                                                <h3 class="slds-text-heading--small">Location Rules</h3>
+                                            </div>
+                                        </div>
+                                    </header>
+                                    <section class="slds-card__body">
+                                        <div  style="margin:1em;">
+                                            <table id="locationRulesTable" class="row-border stripe" width="95%"></table>
+                                            <!-- Datatable goes here -->
+                                        </div>
+                                    </section>
+                                    <footer class="slds-card__footer">
+                                    </footer>
+                                </div>
+                            </div>
+                            <!-- / MAIN CARD -->
+                            <br />
+                        </div>
+                        <!-- / RELATED LIST CARDS -->
+                    </div>
+                </div>
+                <div id="tab-scoped-2" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="tab-scoped-2__item">
+                    <div class="slds">
+                    <!-- RELATED LIST CARDS-->
+                        <div class="slds-grid slds-m-top--large">
+                            <div class="slds-col slds-col-rule--right slds-p-right--large slds-p-left--large slds-size--8-of-12">
+                                <div class="slds-card">
+                                    <!--clay whitespace end-->
+                                    <!-- / CARD BODY = SECTION + TABLE -->
+                                    <header class="slds-card__header slds-grid">
+                                        <div class="slds-col slds-media slds-media--center">
+                                            <div class="slds-media__body">
+                                                <!--<h3 id="callLogHistory" class="slds-text-heading&#45;&#45;small">Call Log History</h3>-->
+                                                <h3 class="slds-text-heading--small">Tasks</h3>
+                                            </div>
+                                        </div>
+                                    </header>
+                                    <section class="slds-card__body">
+                                        <div  style="margin:1em;">
+                                            <!--<table id="callLogHistoryTable" class="row-border stripe" width="95%"></table>-->
+                                            <table id="taskTable" class="row-border stripe" width="95%"></table>
+                                            <!-- Datatable goes here -->
+                                        </div>
+                                    </section>
+                                    <footer class="slds-card__footer">
+                                    </footer>
+                                </div>
+                            </div>
+                            <!-- / MAIN CARD -->
+                            <br />
+                        </div>
+                    </div>
+                    <!-- / RELATED LIST CARDS -->
+                </div>
+
+                <div id="tab-scoped-3" class="slds-tabs--scoped__content slds-hide" role="tabpanel" aria-labelledby="tab-scoped-3__item">
+
+                    <div class="slds">
+                        <!-- RELATED LIST CARDS-->
+                        <div class="slds-grid slds-m-top--large">
+                            <div class="slds-col slds-col-rule--right slds-p-right--large slds-p-left--large slds-size--8-of-12">
+                                <div class="slds-card">
+                                    <!--clay whitespace end-->
+                                    <!-- / CARD BODY = SECTION + TABLE -->
+                                    <header class="slds-card__header slds-grid">
+                                        <div class="slds-col slds-media slds-media--center">
+                                            <div class="slds-media__body">
+                                                <h3 class="slds-text-heading--small">Call Log History</h3>
+                                            </div>
+                                        </div>
+                                    </header>
+                                    <section class="slds-card__body">
+                                        <div  style="margin:1em;">
+                                            <table id="callLogHistoryTable" class="row-border stripe" width="95%"></table>
+                                            <!-- Datatable goes here -->
+                                        </div>
+                                    </section>
+                                    <footer class="slds-card__footer">
+                                    </footer>
+                                </div>
+                            </div>
+                            <!-- / MAIN CARD -->
+                            <br />
+                        </div>
+                        <!-- / RELATED LIST CARDS -->
+                    </div>
+                    <div class="slds">
+                        <c:statusMessages />
+                        <!-- RELATED LIST CARDS-->
+                        <div class="slds-grid slds-m-top--large">
+                            <div class="slds-col slds-col-rule--right slds-p-right--large slds-p-left--large slds-size--8-of-12">
+                                <div class="slds-card">
+                                    <!--clay whitespace end-->
+                                    <!-- / CARD BODY = SECTION + TABLE -->
+                                    <header class="slds-card__header slds-grid">
+                                        <div class="slds-col slds-media slds-media--center">
+                                            <div class="slds-media__body">
+                                                <h3 class="slds-text-heading--small">Log Call</h3>
+                                            </div>
+                                        </div>
+                                    </header>
+                                    <section class="slds-card__body">
+                                        <!--<apex:actionFunction  name="setNoteTemplate" reRender="noteTextAreaDiv" immediate="true" />&lt;!&ndash;action="{!setTemplate}"&ndash;&gt;-->
+                                        <apex:pageBlock title="" id="thePageBlock" mode="maindetail" >
+                                            <apex:pageMessages id="errormsg"/>
+                                            <div class="slds-grid slds-col slds-col-rule--right slds-p-right--large slds-p-left--large">
+                                                    <table id="logACall" width="95%">
+                                                        <tr>
+                                                            <td class="slds-size--2-of-8">
+                                                                <div id="patientDiv" class="slds-form-element">
+                                                                    <div id="patient-error-message" class="slds-form-element__help" style="display:none;">Please select a Patient</div>
+                                                                    <label class="slds-form-element__label" for="patientPicklist"><abbr class="slds-required" title="required">*</abbr>Patient</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                                    <apex:selectList id="patientPicklist" styleClass="slds-input slds-select" value="{!patientId}" size="1">
+                                                                        <apex:selectOptions value="{!patientList}" />
+                                                                    </apex:selectList>
+                                                                </div>
+                                                            </td>
+                                                            <td class="slds-size-6-of-8" style="text-align:center;" rowspan="6">
+                                                                <div id="noteTextAreaDiv" class="slds-form-element">
+                                                                    <div id="note-error-message" class="slds-form-element__help" style="display:none;">Please enter a Call Log note</div>
+                                                                    <apex:inputTextarea id="noteTextArea" rows="6" styleClass="slds-input" value="{!theCallLog.Description}" style="width:96%;"/>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="slds-size--2-of-8">
+                                                                <div id="callOutcomeDiv" class="slds-form-element">
+                                                                    <div id="call-outcome-error-message" class="slds-form-element__help" style="display:none;">Please select a Call Outcome</div>
+                                                                    <label class="slds-form-element__label" for="callOutcomePicklist"><abbr class="slds-required" title="required">*</abbr>Call Outcome</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                                    <apex:inputField styleClass="slds-input slds-select" id="callOutcomePicklist" value="{!theCallLog.Call_Outcome__c}" />
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="slds-size--2-of-8">
+                                                                <div id="callDispositionDiv" class="slds-form-element">
+                                                                    <div id="call-disposition-error-message" class="slds-form-element__help" style="display:none;">Please select a Call Disposition</div>
+                                                                    <label class="slds-form-element__label" for="callDisposition"><abbr class="slds-required" title="required">*</abbr>Call Disposition</label>&nbsp;&nbsp;
+                                                                    <apex:inputField styleClass="slds-input slds-select" id="callDispositionPicklist" value="{!theCallLog.Call_Disposition__c}" onchange="javascript:setTheTemplate();"/>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="slds-size--2-of-8">
+                                                                <label class="slds-form-element__label" for="copyToPatientNotes">Copy to Patient Notes</label>&nbsp;&nbsp;
+                                                                <apex:inputCheckbox id="copyToPatientCheckbox" value="{!copyToPatientNotes}" /> <!-- styleclass="slds-input" -->
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="slds-size--2-of-8">
+                                                                <label class="slds-form-element__label" for="sendToManufacturerCheckbox">Send Note to Manufacturer</label>&nbsp;&nbsp;
+                                                                <apex:inputCheckbox id="sendToManufacturerCheckbox" value="{!theCallLog.Send_to_Manufacturer__c}" /> <!-- styleclass="slds-input" -->
+                                                            </td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td class="slds-size--2-of-8">
+                                                                <div id="manufacturerDiv" class="slds-form-element">
+                                                                    <div id="manufacturer-error-message" class="slds-form-element__help" style="display:none;">Please select a Manufacturer</div>
+                                                                    <span><label class="slds-form-element__label" for="manufacturerPicklist">
+                                                                        <abbr class="slds-required" title="required">*</abbr>Manufacturer</label>&nbsp;&nbsp;
+                                                                        <apex:inputField id="manufacturerPicklist" styleClass="slds-input slds-select" value="{!theCallLog.Manufacturer__c}" />
+                                                                    </span>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                                <apex:actionStatus id="SaveButtonStatus">
+                                                    <apex:facet name="stop">
+                                                        <apex:outputPanel style="float:right;">
+                                                            <table>
+                                                                <tr>
+                                                                    <td style="width:51px">
+                                                                        <button id="saveCallLog" class="slds-button slds-button--brand" onClick="logCall();return false;" style="width:120px;">Save Call Log</button>
+                                                                    </td>
+                                                                </tr>
+                                                            </table>
+                                                        </apex:outputPanel>
+                                                    </apex:facet>
+                                                    <apex:facet name="start">
+                                                        <apex:outputPanel style="align:right;">
+                                                            <apex:commandButton value="Saving..." disabled="true" style="float:right;"/>
+                                                        </apex:outputPanel>
+                                                    </apex:facet>
+                                                </apex:actionStatus>
+                                            </apex:pageBlock>
+                                    </section>
+                                    <footer class="slds-card__footer">
+                                    </footer>
+                                </div>
+                            </div>
+                            <!-- / MAIN CARD -->
+                            <br />
+                        </div>
+                        <!-- / RELATED LIST CARDS -->
+                    </div>
+                </div>
+                <!-- Patient Detail Modal -->
+                <c:ADMPatientDetailModal />
+                <!-- Modal -->
+                <div class="slds-modal" aria-hidden="false" role="dialog" id="callLogModal" >
+                    <div class="slds-modal__container" style="max-width:80em; width:100%">
+                        <header class="slds-modal__header">
+                            <button id="closeModal" class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+                                <svg class="slds-button__icon slds-button__icon_large">
+                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/utility-sprite/svg/symbols.svg#close')}" />
+                                </svg>
+                                <span class="slds-assistive-text">Close</span>
+                            </button>
+                            <h2 id="callLogDetail" class="slds-text-heading--medium slds-hyphenate">Call Log Detail</h2>
+                        </header>
+                        <div class="slds-modal__content slds-p-around--large">
+                            <div class="slds-form">
+                                <div class="slds-grid">
+                                    <div class="slds-size--3-of-3">
+                                        <div class="slds-form-element" style="margin-top:1em;">
+                                            <label class="slds-form-element__label" for="input-id-01"></label>
+                                            <div class="slds-form-element__control">
+                                                <article class="slds-card">
+                                                    <div class="slds-card__header slds-grid">
+                                                        <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                                            <div class="slds-media__figure">
+                                                                <span class="slds-icon_container slds-icon-standard-contact" title="description of icon when needed">
+                                                                  <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                                                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Asset.SLDS, '/assets/icons/standard-sprite/svg/symbols.svg#contact')}" />
+                                                                  </svg>
+                                                                </span>
+                                                            </div>
+                                                            <div class="slds-media__body">
+                                                                <h2><span class="slds-text-heading_medium" id="callLogDetail-ptName"></span></h2>
+                                                            </div>
+                                                        </header>
+                                                    </div>
+                                                    <div class="slds-card__body slds-card__body_inner">
+                                                        <span class="slds-text-heading_small" id="callLogDetail-subject"></span>
+                                                        <div class="slds-grid slds-wrap">
+                                                            <div class="slds-col slds-size--1-of-1 slds-m-top--medium slds-text-title_caps"><span>Location</span></div>
+
+                                                            <div class="slds-col slds-size--1-of-1"><span id="callLogDetail-location"></span></div>
+
+                                                            <div class="slds-col slds-size--1-of-2 slds-m-top--medium slds-text-title_caps"><span>Assigned To</span></div>
+                                                            <div class="slds-col slds-size--1-of-2 slds-m-top--medium slds-text-title_caps"><span>Status</span></div>
+
+                                                            <div class="slds-col slds-size--1-of-2"><span id="callLogDetail-assignedTo"></span></div>
+                                                            <div class="slds-col slds-size--1-of-2"><span id="callLogDetail-status"></span></div>
+
+                                                            <div class="slds-col slds-size--1-of-2 slds-m-top--medium slds-text-title_caps"><span>Call Outcome</span></div>
+                                                            <div class="slds-col slds-size--1-of-2 slds-m-top--medium slds-text-title_caps"><span>Call Disposition</span></div>
+
+                                                            <div class="slds-col slds-size--1-of-2"><span id="callLogDetail-callOutcome"></span></div>
+                                                            <div class="slds-col slds-size--1-of-2"><span id="callLogDetail-callDisposition"></span></div>
+
+                                                            <div class="slds-col slds-size--1-of-2 slds-m-top--medium slds-text-title_caps"><span>Send to Manufacturer?</span></div>
+                                                            <div class="slds-col slds-size--1-of-2 slds-m-top--medium slds-text-title_caps"><span>Manufacturer</span></div>
+
+                                                            <div class="slds-col slds-size--1-of-2"><span id="callLogDetail-sendToManufacturer"></span></div>
+                                                            <div class="slds-col slds-size--1-of-2"><span id="callLogDetail-manufacturer"></span></div>
+
+                                                            <div class="slds-col slds-size--1-of-1 slds-m-top--medium slds-text-title_caps"><span>Comments</span></div>
+                                                            <div class="slds-col slds-size--1-of-1"><span id="callLogDetail-comments"></span></div>
+                                                        </div>
+                                                    </div>
+                                                </article>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="slds-grid" style="margin:1em;">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="slds-modal__footer" />
+                        </div>
+                    </div>
+                <!--end of modal-->
+
+
+                </div>
+            </div>
+        <div class="slds-backdrop" id="backdrop"></div>
+    </apex:form>
+    </body>
+    <script>
+        j$ = jQuery.noConflict();
+        var tableTasks;
+        var tableCallLogHistory;
+        var tableLocationRules;
+        var tableLocationRulesExists = false;
+        var tableTasksExists = false;
+        var tableCallLogHistoryExists = false;
+        var callLogPopped = false;
+        var taskPopped = false;
+        var locPopped = false;
+
+
+        j$(document).ready(function() {
+
+
+            j$('#SectionDetail select.slds-input').height(30).width('43%'); // Set picklist hieght to 30 pixels so it doesn't throw of formatting
+            j$('#SectionDetail input.slds-input').width('15%');
+            j$('#logACall select.slds-input').width('55%');
+            j$('#logACall input.slds-input').width('15%');
+            j$('#manufacturerDiv').hide();
+
+
+            populateCallLogHistoryTable();
+            populateTaskTable();
+            populateLocationRuleTable();
+            //doApplyTab()
+
+        });
+        /*-------------------------------------------------------*/
+        // Calls remote action to populate follow up table
+        /*-------------------------------------------------------*/
+
+        function doApplyTab() {
+            console.log (callLogPopped);
+            console.log (taskPopped);
+            console.log (locPopped);
+            if (callLogPopped && taskPopped && locPopped) {
+                console.log('tryin to pop');
+                applyTabFunctionality();
+            }
+        }
+
+
+        function populateCallLogHistoryTable() {
+
+            j$('#errorMessage').hide();
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.LocationDetailExt.getCallLogItems}',
+                '{!theLocation.Id}',
+                parseCallLogHistoryTable,
+                {escape: true}
+            );
+
+            return false;
+        }
+        function populateTaskTable() {
+
+            j$('#errorMessage').hide();
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.LocationDetailExt.getTasksItems}',
+                '{!theLocation.Id}',
+                parseTaskTableResponse,
+                {escape: true}
+            );
+
+            return false;
+        }
+        function populateLocationRuleTable() {
+
+            j$('#errorMessage').hide();
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.LocationDetailExt.getLocationRules}',
+                '{!theLocation.Id}',
+                parseLocationRuleResponse,
+                {escape: true}
+            );
+
+            return false;
+        }
+        /*-------------------------------------------------------*/
+        // Parses the search results from the remote action and
+        // generates the data table
+        /*-------------------------------------------------------*/
+        function parseTaskTableResponse(result, event){
+            if(event.status) {
+                if(tableTasksExists) {
+                    j$('#taskTable').DataTable().destroy();
+                }
+   
+                tableTasks = j$('#taskTable').DataTable({
+                    data: result,
+                    columns: [
+                        {data: "Name", defaultContent: "&mdash;", title: "Doc Type",
+                            render: function(data, display, result) {
+                                if(data) {
+                                    return '<a target="_blank" href="'+result.Id+'">'+data+'</a>';
+                                }
+                        }},
+                        {data: "ProviderName", defaultContent: "&mdash;", title: "Provider",
+                            render: function(data, display, result) {
+                                if(data) {
+                                    return '<a target="_blank" href="'+result.ProviderId+'">'+data+'</a>';
+                                }
+                        }},
+                        {data: "PatientName", defaultContent: "&mdash;", title: "Patient",
+                            render: function(data, display, result) {
+                                if(data) {
+                                    return '<a target="_blank" onClick="displayPatientModal(\''+result.PatientId+'\');return false;">'+data+'</a>';
+                                }
+                        }},
+                        {data: "Status", defaultContent: "&mdash;", title: "Task Status"},
+//                        {data: "NumOfQACycles", defaultContent: "&mdash;", title: "Num of QA Cycles"}, // Hidden until Miguel wants to put it back in
+                        {data: "CreatedDate", defaultContent: "&mdash;", title: "Created Date"},
+                        {data: "NeededDate", defaultContent: "&mdash;", title: "Date Needed"},
+                        {data: "LastContactDate", defaultContent: "&mdash;", title: "Last Contacted"},
+                        {data: "Comments", defaultContent: "&mdash;", title: "Comments"},
+                        {data: "ConduitId", defaultContent: "&mdash;", title: "Open in Conduit",
+                            render: function(data) {
+                                return '<button class="slds-button slds-button--brand" onClick="displayConduit();">Conduit</button>';
+
+                            }
+
+                        }
+                    ],
+                    initComplete: function() {
+                        taskPopped = true;
+                        doApplyTab();
+                    },
+                    select: {
+                       style: 'single'
+                    }
+                });
+                tableTasksExists = true;
+
+            } else if (event.type === 'exception') {
+                console.log('Exception happened');
+                console.log('EXCEPTION: ' + event.statuscode);
+                console.log(event);
+                j$('#errorMessage').show();
+            } else {
+                console.log('NOTHING HAPPENED');
+            }
+        }
+
+        function displayConduit() {
+            popitup('http://www.conduitoffice.com','cond');
+        }
+
+        function popitup(url,windowName) {
+            newwindow=window.open(url,windowName,'height=800,width=1200');
+            if (window.focus) {newwindow.focus()}
+            return false;
+        }
+
+        function parseCallLogHistoryTable(result, event){
+            if(event.status) {
+                if(tableCallLogHistoryExists) {
+                    j$('#callLogHistoryTable').DataTable().destroy();
+                }
+
+                tableCallLogHistory = j$('#callLogHistoryTable').DataTable({
+                    data: result,
+                    columns: [
+                        {data: "Subject", defaultContent: "&mdash;", title: "Subject",
+                            render: function(data, display, result) {
+                                if(data) {
+                                    return '<a href="#callLogHistoryTable" onClick="displayCallLogDetailModal(\''+result.Id+'\')">'+data+'</a>';
+                                }
+                        }},
+                        {data: "PatientName", defaultContent: "&mdash;", title: "Patient",
+                            render: function(data, display, result) {
+                                if(data) {
+                                    return '<a target="_blank" href="'+result.PatientId+'">'+data+'</a>';
+                                }
+                        }},
+                        {data: "CreatedDate", defaultContent: "&mdash;", title: "Created Date"},
+                        {data: "CreatedBy", defaultContent: "&mdash;", title: "Created By",
+                            render: function(data, display, result) {
+                                if(data) {
+                                    return '<a target="_blank" href="'+result.CreatedById+'">'+data+'</a>';
+                                }
+                        }},
+                        {data: "Comments", defaultContent: "&mdash;", title: "Comments"},
+                        {data: "CallOutcome", defaultContent: "&mdash;", title: "Call Outcome"},
+                        {data: "CallDisposition", defaultContent: "&mdash;", title: "Call Disposition"}
+                    ],
+                    initComplete: function() {
+                        callLogPopped = true;
+                        doApplyTab();
+                    },
+                    select: {
+                       style: 'single'
+                    }
+ 
+                });
+                tableCallLogHistoryExists = true;
+            } else if (event.type === 'exception') {
+                console.log('Exception happened');
+                console.log('EXCEPTION: ' + event.statuscode);
+                console.log(event);
+                j$('#errorMessage').show();
+            } else {
+                console.log('NOTHING HAPPENED');
+            }
+        }
+        function parseLocationRuleResponse(result, event) {
+            if(event.status) {
+                if(tableLocationRulesExists) {
+                    j$('#locationRulesTable').DataTable().destroy();
+                }
+
+                tableLocationRules = j$('#locationRulesTable').DataTable({
+                    data: result,
+                    columns: [
+                        {data: "ProviderRuleType", defaultContent: "&mdash;", title: "Provider Rule Type",
+                            render: function(data, display, result) {
+                                if(data) {
+                                    return '<a target="_blank" href="'+result.Id+'">'+data+'</a>';
+                                }
+                        }},
+
+                        {data: "Values", defaultContent: "&mdash;", title: "Values"},
+                        {data: "Required", defaultContent: "&mdash;", title: "Required",
+                            render: function(data, display, result) {
+                                if(data) {
+                                    return '<input type="checkbox" disabled="true" checked>';
+                                } else {
+                                    return '<input type="checkbox" disabled="true"/>';
+                                }
+                        }},
+                    ],
+                    initComplete: function() {
+                        locPopped = true;
+                        doApplyTab();
+                    },
+                    select: {
+                       style: 'single'
+                    }
+                });
+                tableLocationRulesExists = true;
+            } else if (event.type === 'exception') {
+                console.log('Exception happened');
+                console.log('EXCEPTION: ' + event.statuscode);
+                console.log(event);
+                j$('#errorMessage').show();
+            } else {
+                console.log('NOTHING HAPPENED');
+            }
+        }
+
+        //Display Modal
+        function displayCallLogDetailModal(callLogId) {
+            console.log('displayPatientModal: ' + callLogId);
+            LocationDetailExt.getCallLogModalDetails(callLogId, function(result, err) {
+                console.log(result);
+                if (result.Patient__c != null) j$('#callLogDetail-ptName').text(result.Patient__r.Name)
+                    else j$('#callLogDetail-ptName').text('–');
+                if (result.Owner != null) j$('#callLogDetail-assignedTo').text(result.Owner.Name)
+                    else j$('#callLogDetail-assignedTo').text('–');
+                if (result.Location__c != null) j$('#callLogDetail-location').text(result.Location__r.Location_Name__c)
+                    else j$('#callLogDetail-location').text('–');
+                if (result.Description != null) j$('#callLogDetail-comments').text(decodeHtml(result.Description))
+                    else j$('#callLogDetail-comments').text('–');
+                if (result.Status != null) j$('#callLogDetail-status').text(result.Status)
+                    else j$('#callLogDetail-status').text('–');
+                if (result.Subject != null) j$('#callLogDetail-subject').text(result.Subject)
+                    else j$('#callLogDetail-subject').text('–');
+                if (result.Call_Disposition__c != null) j$('#callLogDetail-callDisposition').text(result.Call_Disposition__c)
+                    else j$('#callLogDetail-callDisposition').text('–');
+                if (result.Call_Outcome__c != null) j$('#callLogDetail-callOutcome').text(result.Call_Outcome__c);
+                if (result.Send_to_Manufacturer__c == true) j$('#callLogDetail-sendToManufacturer').text('Yes')
+                    else j$('#callLogDetail-sendToManufacturer').text('No');
+                if (result.Manufacturer__c != null) j$('#callLogDetail-manufacturer').text(result.Manufacturer__c)
+                    else j$('#callLogDetail-manufacturer').text('–');
+                j$('#backdrop').addClass('slds-backdrop--open');
+                j$('#callLogModal').addClass('slds-fade-in-open');
+            })
+        }
+
+        j$('#closeModal').click(function(e) {
+            e.preventDefault();
+            j$('#callLogModal').removeClass('slds-fade-in-open');
+            j$('#backdrop').removeClass('slds-backdrop--open');
+        })
+
+        // Decodes escape characters back to plaintext
+        function decodeHtml(html) {
+            var txt = document.createElement("textarea");
+            txt.innerHTML = html;
+            return txt.value;
+        }
+
+        function applyTabFunctionality() {
+            console.log ('true true true');
+            j$('li.slds-tabs--scoped__item').click(function() {
+
+                var currentTab = j$(this); //Active Tab
+                var otherTabs = j$("li.slds-tabs--scoped__item").not(this); //Inactive Tabs
+
+                var currentPageId = j$(this).find('a').attr('aria-controls');
+                var currentPage = j$('#'+currentPageId);
+                var otherPages = j$("div.slds-tabs--scoped__content").not(currentPage); //Inactive Pages
+
+                if(!currentTab.hasClass('slds-active')) { //This code runs when an inactive tab is clicked
+                    otherTabs.removeClass("slds-active");
+                    currentTab.addClass("slds-active");
+                    currentPage.toggleClass('slds-hide slds-show');
+                    otherPages.removeClass('slds-show').addClass('slds-hide');
+                }
+            });
+        }
+
+        function logCall(){
+            j$("#errorMsgDiv").hide();
+            j$("#successMsgDiv").hide();
+            j$("div[id$='error-message']").hide();
+            j$("div[id$='Div']").removeClass('slds-has-error');
+
+            var callDisposition = j$('select[id$=callDispositionPicklist]').val();
+            var callOutcome = j$('select[id$=callOutcomePicklist]').val();
+            var patientId = j$('select[id$=patientPicklist]').val();
+            var copyToPatient = j$('input[id$=copyToPatientCheckbox]').is(':checked');
+            var sendToManufacturer = j$('input[id$=sendToManufacturerCheckbox]').is(':checked');
+            var manufacturer = j$('select[id$=manufacturerPicklist]').val();
+            var note = j$('textarea[id$=noteTextArea').val();
+            var areErrors = false;
+
+            if(callDisposition == '') {
+                j$('#callDispositionDiv').addClass('slds-has-error');
+                j$('#call-disposition-error-message').show();
+                areErrors = true;
+            }
+
+            if(callOutcome == '') {
+                j$('#callOutcomeDiv').addClass('slds-has-error');
+                j$('#call-outcome-error-message').show();
+                areErrors = true;
+            }
+
+            if(patientId == '') {
+                j$('#patientDiv').addClass('slds-has-error');
+                j$('#patient-error-message').show();
+                areErrors = true;
+            }
+
+            if(sendToManufacturer == true && manufacturer == '') {
+                j$('#manufacturerDiv').addClass('slds-has-error');
+                j$('#manufacturer-error-message').show();
+                areErrors = true;
+            }
+
+            if(note == '') {
+                j$('#noteTextAreaDiv').addClass('slds-has-error');
+                j$('#note-error-message').show();
+                areErrors = true;
+            }
+
+            if(!areErrors){
+
+                LocationDetailExt.logCall(patientId, copyToPatient, note, '{!theLocation.Id}', callDisposition, callOutcome, sendToManufacturer, manufacturer, function(result, event) {
+                    resetForm();
+                    if (result != 'Success'){
+                            j$('#errorMsg').text(result);
+                            j$('#errorMsgDiv').show();
+                        } else {
+                            resetForm();
+                            populateCallLogHistoryTable();
+                            populateTaskTable();
+                            j$('#successMsg').text('ADM Follow-up Note created');
+                            j$('#successMsgDiv').show();
+                        }
+
+                });
+            }
+
+            return false;
+        }
+
+        // Toggle the Manufacturer picklist based on the Send to Mfg checkbox
+        j$('input[id$=sendToManufacturerCheckbox]').change(function(e) {
+            if (j$('input[id$=sendToManufacturerCheckbox]').is(':checked')) { // Send to mfg checkbox Checked
+                j$('#manufacturerDiv').show(); // Show mfg picklist
+            } else { // Urgent checkbox unchecked
+                j$('#manufacturerDiv').hide(); // Hide mfg picklist
+                j$('select[id$=manufacturerPicklist]').find('option:first').prop('selected', true); // Clear mfg picklist
+            }
+        });
+
+        function resetForm(){
+            j$('select[id$=callDispositionPicklist]').find('option:first').prop('selected', true);
+            j$('select[id$=callOutcomePicklist]').find('option:first').prop('selected', true);
+            j$('select[id$=patientPicklist]').find('option:first').prop('selected', true);
+            j$('input[id$=copyToPatientCheckbox]').prop('checked', true);
+            j$('input[id$=sendToManufacturerCheckbox]').prop('checked', false);
+            j$('#manufacturerDiv').hide();
+            j$('select[id$=manufacturerPicklist]').find('option:first').prop('selected', true);
+            j$('textarea[id$=noteTextArea').val('');
+        }
+
+        function setTheTemplate(){
+            var theDisposition = j$("select[id$='callDispositionPicklist']").val();
+            LocationDetailExt.setTemplate(theDisposition, function(result, event)
+                {
+                    console.log(result);
+                    j$("textarea[id$='noteTextArea']").val(result);
+                }, {escape: false});
+        }
+    </script>
+    </html>
+</apex:page>

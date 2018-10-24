@@ -1,0 +1,144 @@
+<!--
+ - Created by danielpulache on 11/7/17.
+ -->
+
+<apex:page id="LocationFollowUp" controller="LocationFollowUpController">
+    <html xmlns="https://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <script src="{!URLFOR($Resource.aljs, '/jquery.aljs-all-with-moment.min.js')}"></script>
+    <apex:includeScript value="//code.jquery.com/jquery-2.1.1.min.js"/>
+    <apex:includeScript value="/soap/ajax/26.0/connection.js"/>
+    <apex:includeScript value="/js/functions.js"/>
+
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.css"/>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.js"></script>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/select/1.2.3/js/dataTables.select.min.js"></script>
+    <script type="text/javascript" charset="utf8" src="//cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
+    <head>
+        <title>Follow-Up</title>
+        <apex:slds />
+    </head>
+    <body>
+        <div class="slds">
+            <!-- RELATED LIST CARDS-->
+            <div class="slds-grid slds-m-top--large">
+                <div class="slds-col slds-col-rule--right slds-p-right--large slds-p-left--large slds-size--8-of-12">
+                    <div class="slds-card">
+                        <!--clay whitespace end-->
+                        <!-- / CARD BODY = SECTION + TABLE -->
+                        <header class="slds-card__header slds-grid">
+                            <div class="slds-col slds-media slds-media--center">
+                                <div class="slds-media__figure">
+                                    <svg aria-hidden="true" class="slds-icon slds-icon-standard-contact slds-icon--small">
+                                        <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/standard-sprite/svg/symbols.svg#task')}"></use>
+                                    </svg>
+                                </div>
+                                <div class="slds-media__body">
+                                    <h3 class="slds-text-heading--small">Location Follow Up Queue</h3>
+                                </div>
+                            </div>
+                        </header>
+                        <section class="slds-card__body">
+                            <div  style="margin:1em;">
+                                <table id="LocationFollowUpTable" class="row-border stripe" width="95%"></table>
+                                <!-- Datatable goes here -->
+                            </div>
+                        </section>
+                        <footer class="slds-card__footer">
+                            <!--<div>-->
+                            <!--<button class="slds-button slds-button&#45;&#45;neutral compact-button">Save</button>-->
+                            <!--</div>-->
+                            <!-- Warning toast: Search timed out -->
+                            <div class="toast-message" style="height: 4rem; display:none;" id="errorMessage">
+                                <div class="slds-notify_container slds-is-relative">
+                                    <div class="slds-notify slds-notify_toast slds-theme_error" role="alert">
+                                        <span class="slds-assistive-text">Time Out Warning</span>
+                                        <span class="slds-icon_container slds-icon-utility-success slds-m-right_small slds-no-flex slds-align-top" title="Time Out">
+                                                        <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                                            <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/utility-sprite/svg/symbols.svg#error')}" />
+                                                        </svg>
+                                                    </span>
+                                        <div class="slds-notify__content">
+                                            <h2 class="slds-text-heading_small ">Search request timed out. Please try again.</h2>
+                                        </div>
+                                        <button class="slds-button slds-button_icon slds-notify__close slds-button_icon-inverse" type="button" id="closeTimeOutMessage" title="Close">
+                                            <svg class="slds-button__icon slds-button__icon_large" aria-hidden="true">
+                                                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/utility-sprite/svg/symbols.svg#close')}" />
+                                            </svg>
+                                            <span class="slds-assistive-text">Close</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </footer>
+                    </div>
+                </div>
+                <!-- / MAIN CARD -->
+                <br />
+            </div>
+            <!-- / RELATED LIST CARDS -->
+        </div>
+    <!--</apex:form>-->
+    </body>
+    <script>
+        j$ = jQuery.noConflict();
+        var table;
+        var datatableExists = false;
+        j$(document).ready(function(){
+            j$('#errorMessage').hide();
+            populateFollowUpTable();
+        });
+        /*-------------------------------------------------------*/
+        // Calls remote action to populate follow up table
+        /*-------------------------------------------------------*/
+        function populateFollowUpTable() {
+            j$('#errorMessage').hide();
+            Visualforce.remoting.Manager.invokeAction(
+                '{!$RemoteAction.LocationFollowUpController.getFollowUpItems}',
+                parseResponse,
+                {escape: true}
+            );
+            return false;
+        }
+        /*-------------------------------------------------------*/
+        // Parses the search results from the remote action and
+        // generates the data table
+        /*-------------------------------------------------------*/
+        function parseResponse(result, event){
+            if(event.status) {
+                if(datatableExists) {
+                    j$('#LocationFollowUpTable').DataTable().destroy();
+                }
+                table = j$('#LocationFollowUpTable').DataTable({
+                    data: result,
+                    columns: [
+                        {data: "locationTaskSetName", defaultContent: "&mdash;", title: "Location Task Set",
+                            render: function(data, display, result) {
+                                if(data) {
+                                    return '<a target="_blank" href="'+result.locationTaskSetIdURL+'">'+data+'</a';
+                                }
+                        }},
+                        {data: "priority", defaultContent: "&mdash;", title: "Priority"},
+                        {data: "numberOfPatients", defaultContent: "&mdash;", title: "Number of Patients"},
+                        {data: "numberOfTasks", defaultContent: "&mdash;", title: "Number of Documents"},
+                        {data: "dollarValue", defaultContent: "&mdash;", title: "Task Set Value($)"},
+                        {data: "providerRulesScore", defaultContent: "&mdash;", title: "Provider Rules Score"},
+                        {data: "lastContact", defaultContent: "&mdash;", title: "Last Contacted"},
+                        {data: "followUpDate", defaultContent: "&mdash;", title: "Follow Up Date"},
+                    ],
+                    select: {
+                       style: 'single'
+                    }
+                });
+                datatableExists = true;
+            } else if (event.type === 'exception') {
+                console.log('Exception happened');
+                console.log('EXCEPTION: ' + event.statuscode);
+                console.log(event);
+                j$('#errorMessage').show();
+            } else {
+                console.log('NOTHING HAPPENED');
+            }
+        }
+    </script>
+    </html>
+</apex:page>

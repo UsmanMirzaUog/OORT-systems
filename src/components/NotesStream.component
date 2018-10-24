@@ -1,0 +1,124 @@
+<!--
+ - Created by krizia on 6/18/18.
+ -->
+
+<apex:component id="NotesStream" controller="NotesStreamController">
+
+    <html xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <apex:includeScript value="/soap/ajax/26.0/connection.js"/>
+    <apex:includeScript value="/js/functions.js"/>
+    <apex:includeScript value="/support/console/36.0/integration.js"/>
+
+
+    <apex:attribute name="thePatientId" type="String" assignTo="{!patientId}" description="patientId in String format"/>
+
+
+    <head>
+        <title>Patient Notes Stream</title>
+        <apex:slds />
+    </head>
+    <!--<body bgcolor="white">-->
+    <!-- REQUIRED SLDS WRAPPER -->
+    <div class="slds-scope">
+        <h1 class="slds-text-heading--label slds-m-bottom--small">
+            Activity Feed
+        </h1>
+
+        <div class="slds-grid slds-m-top--large">
+            <div class="slds-col slds-col-rule--right slds-p-right--large slds-size--1-of-1">
+                <ul class="slds-timeline">
+
+
+
+
+                    <apex:repeat value="{!theTaskList}" var="t">
+                        <div class="slds-timeline__item_task">
+                            <span class="slds-assistive-text">Task</span>
+                            <div class="slds-media">
+                                <div class="slds-media__figure">
+                                    <!--<svg class="slds-icon slds-icon_small" aria-hidden="true">-->
+                                    <apex:variable var="v" value="1" rendered="{!t.theT.RecordType.Name == 'ADM'}" >
+                                        <div class="slds-icon_container slds-icon-standard-task slds-timeline__icon" title="task" >
+                                            <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                                <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/custom-sprite/svg/symbols.svg#custom18')}" />
+                                            </svg>
+                                        </div>
+                                    </apex:variable>
+                                    <apex:variable var="v" value="1" rendered="{!t.theT.RecordType.Name == 'Call Log'}" >
+                                        <div class="slds-icon_container slds-icon-standard-task slds-timeline__icon" title="task" >
+                                            <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                                <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/custom-sprite/svg/symbols.svg#custom22')}" />
+                                            </svg>
+                                        </div>
+                                    </apex:variable>
+                                    <apex:variable var="v" value="1" rendered="{!t.theT.RecordType.Name == 'Opp Note'}" >
+                                        <div class="slds-icon_container slds-icon-standard-task slds-timeline__icon" title="task" >
+                                            <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                                <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/custom-sprite/svg/symbols.svg#custom83')}" />
+                                            </svg>
+                                        </div>
+                                    </apex:variable>
+                                    <apex:variable var="v" value="1" rendered="{!t.theT.RecordType.Name == 'PAR'}" >
+                                                <span>
+                                                <span class="slds-icon_container slds-timeline__icon" title="task" >
+                                                    <svg class="slds-icon slds-icon_small" aria-hidden="true" style="background: rgb(220,203,100);" >
+                                                        <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/custom-sprite/svg/symbols.svg#custom18')}" />
+                                                    </svg>
+                                                </span>
+                                                </span>
+                                    </apex:variable>
+                                    <apex:variable var="v" value="1" rendered="{!t.theT.RecordType.Name == 'Patient Note'}" >
+                                        <div class="slds-icon_container slds-icon-standard-task slds-timeline__icon" title="task" >
+                                            <svg class="slds-icon slds-icon_small" aria-hidden="true">
+                                                <use xlink:href="{!URLFOR($Resource.SLDS232, 'assets/icons/custom-sprite/svg/symbols.svg#custom83')}" />
+                                            </svg>
+                                        </div>
+                                    </apex:variable>
+                                    <!--</svg>-->
+                                    <!--</div>-->
+                                </div>
+                                <div class="slds-media__body">
+                                    <div class="slds-grid slds-grid_align-spread slds-timeline__trigger">
+                                        <div class="slds-grid slds-grid_vertical-align-center slds-truncate_container_75 slds-no-space">
+                                            <h3 class="slds-truncate" title="{!t.theT.Subject}">
+                                                <a onClick="javascript:openCaseSubtab('/{!t.theT.Id}');">
+                                                    <strong>{!t.theT.Subject}</strong>
+                                                </a>
+                                            </h3>
+                                        </div>
+                                        <div class="slds-timeline__actions slds-timeline__actions_inline">
+                                            <p>{!t.CreatedDateString}</p>
+                                        </div>
+                                    </div>
+                                    <p class="slds-m-horizontal_medium">{!t.theT.Description}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </apex:repeat>
+
+
+
+
+
+                </ul>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        function openCaseSubtab(url) {
+             // Check if user is in the Console, otherwise open as a regular URL
+             if (sforce.console.isInConsole()) {
+                 sforce.console.getEnclosingPrimaryTabId(function(result){
+                     sforce.console.openSubtab(result.id, url, true, '', null);
+                 });
+             } else {
+                 window.open(url);
+             }
+        }
+      </script>
+    <!--</body>-->
+    </html>
+
+
+
+</apex:component>
